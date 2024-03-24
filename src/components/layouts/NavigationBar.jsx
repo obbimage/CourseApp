@@ -82,9 +82,9 @@ const listItemNavCourse = [
 ]
 const ItemComponent = ({ listItem, open }) => {
     return (
-        listItem.map((item) => {
+        listItem.map((item,index) => {
             return (
-                <Link to={item.url}
+                <Link key={index} to={item.url}
                     sx={{
                         display: 'flex',
                         flexDirection: 'row',
@@ -122,9 +122,6 @@ const ItemComponent = ({ listItem, open }) => {
 export default function NavigationBar({ open, handleToggle, handleOnMouseEnter, handleOnMuoseLeave }) {
     const theme = useTheme();
 
-    // const handleOnMouseEnter = (e) =>{
-    //     handleToggle();
-    // }
     return (
         <div onMouseEnter={handleOnMouseEnter} onMouseLeave={handleOnMuoseLeave}>
             <Drawer variant="permanent" open={open}>

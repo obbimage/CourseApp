@@ -12,7 +12,6 @@ function App() {
     <Box sx={{
       width: "100%",
       height: "100%",
-      backgroundColor: theme.palette.primary.bg,
       display: 'flex',
       // justifyContent: 'center'
     }}>

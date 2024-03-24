@@ -1,47 +1,64 @@
-import { Box, Button, Link, Paper, Stack, TextField, Typography } from "@mui/material";
+import { Alert, Box, Button, Link, Paper, Stack, TextField, Typography } from "@mui/material";
 import TextFieldPassword from "../layouts/TextFieldPassword";
 import TextLine from "../layouts/TextLine";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { stringAlert } from "../../static/stringAlert";
+import { getUser, login } from "../../api/auth";
+import { ROLE_EUDCATOR } from "../../api/config";
 
 
 export default function Login() {
     const [userName, setUserName] = useState("");
-    const [isNotValidUserName, setIsNotValidUserName] = useState(false);
+    const [isNotValidUserName, setIsNotValidUserName] = useState(false); // dùng để toggle err input
     const [password, setPassword] = useState("");
-    const [isNotValidPassword, setIsNotValidPassword] = useState(false)
+    const [isNotValidPassword, setIsNotValidPassword] = useState(false) // dùng để toggle err input
+    const [isShowLoginFaile, setIsShowLoginFaile] = useState(false); // toogle thông báo khi login faile
 
-
-    const handleInputUser = (e) => {
+    const handleChangeInputUser = (e) => {
         setUserName(e.target.value);
-        setIsNotValidUserName(false);
+        setIsNotValidUserName(false); // tắt err
+        setIsShowLoginFaile(false); // tắt alert faile
     }
-    const handleInputPassword = (e) => {
+    const handleChangeInputPassword = (e) => {
         setPassword(e.target.value);
-        setIsNotValidPassword(false);
+        setIsNotValidPassword(false); // tăt err
+        setIsShowLoginFaile(false); // tắt alert faile
     }
-
 
     const handleLogin = (e) => {
-        if (validateUserName()) {
-            setIsNotValidUserName(true)
+        let isValidate = true;
+        if (!validateUserName()) {
+            setIsNotValidUserName(true);
+            isValidate = false;
         }
-        if (validatePassword()) {
+        if (!validatePassword()) {
             setIsNotValidPassword(true);
+            isValidate = false;
         }
+        if (isValidate) {
+            login(userName, password, 'educator')
+                .then((dataUser) => {
+                    if(dataUser){
+                        console.log(dataUser)
+                    }else{
+                        setIsShowLoginFaile(true);
+                    }
+                })
+        }
+
 
     }
 
     const validateUserName = () => {
         if (userName)
-            return false;
-        return true;
+            return true;
+        return false;
     }
 
     const validatePassword = () => {
         if (password)
-            return false;
-        return true;
+            return true;
+        return false;
     }
 
     return (
@@ -58,8 +75,11 @@ export default function Login() {
                     <Typography variant="title" sx={{ textAlign: 'center' }} >
                         Đăng nhập
                     </Typography>
+                    <Box display={isShowLoginFaile ? 'block':'none'}>
+                        <Alert variant="filled" severity="error" >Tài Khoản hoặc mật khẩu không đúng vui lòng đăng nhập lại!</Alert>
+                    </Box>
                     <TextField
-                        onChange={handleInputUser}
+                        onChange={handleChangeInputUser}
                         value={userName}
                         label="UserName"
                         error={isNotValidUserName}
@@ -68,7 +88,7 @@ export default function Login() {
                     <TextFieldPassword
                         error={isNotValidPassword}
                         helperText={isNotValidPassword ? stringAlert.require : ""}
-                        onChange={handleInputPassword}
+                        onChange={handleChangeInputPassword}
                         value={password}
                     />
                     <Link underline="hover">Quên mật khẩu</Link>

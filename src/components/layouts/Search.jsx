@@ -53,12 +53,14 @@ export default function Search() {
             <StyledInputBase
                 placeholder="Tìm kiếm..."
                 inputProps={{ 'aria-label': 'search' }} />
-                <Button
+
+                <Button disableElevation
+                variant="contained"
                     sx={{
                         width: '100%',
-                        height: '100%',
-                        backgroundColor: theme.palette.text.primary,
+                        // backgroundColor: theme.palette.text.primary,
                         color: theme.palette.background.default,
+                        border:'none'
                     }}>
                     <SearchIcon />
                 </Button>
