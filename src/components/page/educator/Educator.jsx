@@ -1,14 +1,17 @@
 import { Box } from "@mui/material";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Header from "../../layouts/Header";
 import NavigationBar from "../../layouts/NavigationBar";
 import EducatorProfile from "./EducatorProfile";
 import { Outlet } from "react-router-dom";
+import { login } from "../../../api/auth";
 
 
 export default function Educator() {
     const [openNavgationBar, setOpenNavgatioBar] = useState(false);
+
+    
     const handleToggleNavbar = () => {
         setOpenNavgatioBar(!openNavgationBar);
     }
@@ -40,8 +43,6 @@ export default function Educator() {
                     <Outlet/>
                 </Box>
             </Box>
-
-
         </Box>
     )
 }

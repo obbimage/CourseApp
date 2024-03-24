@@ -2,6 +2,7 @@ import { Button, Link, Paper, Stack, TextField, Typography } from "@mui/material
 import { useState } from "react";
 import { stringAlert } from "../../static/stringAlert";
 import TextFieldPassword from "../layouts/TextFieldPassword";
+import { register } from "../../api/auth";
 
 export default function Signup() {
     const [userName, setUserName] = useState("");
@@ -40,6 +41,7 @@ export default function Signup() {
             setIsNotValidConfirmPassword(true);
         }
 
+        register(userName,password);
     }
 
     const validateUserName = () => {
