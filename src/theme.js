@@ -19,8 +19,8 @@ const theme = createTheme({
     title: {
       fontSize: 35,
     },
-    // Disable h3 variant
-    h3: undefined,
+    // // Disable h3 variant
+    // h3: undefined,
   },
   components: {
     MuiTypography: {

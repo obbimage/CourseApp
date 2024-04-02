@@ -10,7 +10,7 @@ function itemSelectMenu(key, value) {
 }
 export default function EducatorCourse() {
     const theme = useTheme();
-    const [sort,setSort] = useState("");
+    const [sort, setSort] = useState("");
     const listFillterMenu = [
         itemSelectMenu("Mới nhất", 'new'),
         itemSelectMenu("Cũ nhất", "old"),
@@ -18,7 +18,7 @@ export default function EducatorCourse() {
         itemSelectMenu("Z-A", "decrease"),// giảm dần
     ]
 
-    const handleSelectSort = (value)=>{
+    const handleSelectSort = (value) => {
         setSort(value);
     }
 
@@ -42,16 +42,20 @@ export default function EducatorCourse() {
                 }}>
                     <Search />
                     <DropDownMenu ListItem={listFillterMenu}
-                    onChange={handleSelectSort} />
+                        onChange={handleSelectSort} />
                 </Box>
-                <Link to="create">
-                    <Button variant="contained">Khóa học mới</Button>
+                <Link to="create" sx={{ height: '100%' }}>
+                    <Button
+                        sx={{ height: '100%' }}
+                        variant="contained">Khóa học mới</Button>
                 </Link>
             </Box>
 
             <Box sx={{ display: 'flex', flexWrap: 'wrap', flexDirection: 'row', margin: '0 -10px' }}>
                 <Box sx={{ margin: '10px' }}>
-                    <CardCourse />
+                    <Link to="edit">
+                        <CardCourse />
+                    </Link>
                 </Box>
                 <Box sx={{ margin: '10px' }}>
                     <CardCourse />

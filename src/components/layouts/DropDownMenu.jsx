@@ -1,7 +1,15 @@
-import { FormControl, FormHelperText, MenuItem, Select } from "@mui/material";
+import { ResetTvRounded } from "@mui/icons-material";
+import { FormControl, FormHelperText, InputLabel, MenuItem, Select } from "@mui/material";
 import { useEffect, useState } from "react";
 
-export function DropDownMenu({ ListItem,onChange }) {
+export const dropDownItem = (key,value) =>{
+
+    return({
+        key,value
+    });
+}
+
+export function DropDownMenu({ ListItem,onChange,label }) {
     const [value, setValue] = useState("");
 
 
@@ -10,7 +18,7 @@ export function DropDownMenu({ ListItem,onChange }) {
     }
 
     useEffect(()=>{
-        onChange(value);
+       onChange && onChange(value);
     },[value]);
 
     // trong lần render đầu tiên
@@ -22,7 +30,9 @@ export function DropDownMenu({ ListItem,onChange }) {
     }, []);
 
     return (
-        <FormControl sx={{ height: '100%',width:'100%', minWidth: 120, boxSizing: 'border-box' }}>
+        <FormControl sx={{ height: '100%',width:'100%', minWidth: 120, boxSizing: 'border-box' }}
+        variant="standard">
+            <label>{label}</label>
             <Select
                 sx={{ height: '100%' }}
                 value={value}

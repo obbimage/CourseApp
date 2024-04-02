@@ -1,26 +1,24 @@
 import { Box } from "@mui/material";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { Outlet } from "react-router-dom";
 import Header from "../../layouts/Header";
 import NavigationBar from "../../layouts/NavigationBar";
-import EducatorProfile from "./EducatorProfile";
-import { Outlet } from "react-router-dom";
-import { login } from "../../../api/auth";
 
 
 export default function Educator() {
     const [openNavgationBar, setOpenNavgatioBar] = useState(false);
 
-    
+
     const handleToggleNavbar = () => {
         setOpenNavgatioBar(!openNavgationBar);
     }
 
-    const handleOnMouseEnter =  ()=>{
+    const handleOnMouseEnter = () => {
         setOpenNavgatioBar(true);
     }
 
-    const handleOnMuoseLeave = ()=>{
+    const handleOnMuoseLeave = () => {
         setOpenNavgatioBar(false);
     }
     const handleMenuIcon = () => {
@@ -40,7 +38,7 @@ export default function Educator() {
                 ></Header>
                 <Box flexGrow={1}>
                     {/* <EducatorProfile /> */}
-                    <Outlet/>
+                    <Outlet />
                 </Box>
             </Box>
         </Box>

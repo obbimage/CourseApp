@@ -1,47 +1,60 @@
-import { Box, Typography, styled, useTheme } from "@mui/material";
-import { Link } from "react-router-dom";
-import theme from "../../../theme";
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import SettingsIcon from '@mui/icons-material/Settings';
+import { Box, Button, Chip, Link, Typography, useTheme } from "@mui/material";
+import EditNavbarCourse from "./NavEditbarCourse";
+import Intended from './editCourses/Intended';
+import { Outlet } from 'react-router-dom';
 
-const objNavLink = (name, url = '#') => {
-    return ({ name, url });
-}
-const listCreateContent = [
-    objNavLink("Quay phim & chỉnh sửa"),
-    objNavLink("Chương trình giảng dạy"),
 
-]
-
-const CircleCheck = styled('span')
-    (({ theme }) => ({
-        width: theme.spacing(2),
-        height: theme.spacing(2),
-        marginRight:theme.spacing(1),
-        border: '1px solid black',
-        borderRadius: '50%'
-
-    }))
 
 export default function EditCourse() {
     const theme = useTheme();
 
     return (
-        <Box sx={{display:'flex',justifyContent:'center'}}>
-            <Box>
-                <Typography>Tạo nội dung của bạn</Typography>
-                {
-                    listCreateContent.map((item) => {
-                        return (
-                            <Link
-                                key={item.name}>
-                                <Box sx={{ display: 'flex',alignItems:'center' }}>
-                                    <CircleCheck></CircleCheck>
-                                    <Typography>{item.name}</Typography>
-                                </Box>
-                            </Link>
-                        )
-                    })
-                }
-                <Typography>Xuất bản khóa học của bạn</Typography>
+        <Box sx={{ width: '100%' }}>
+            {/* header */}
+            <Box sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                position: 'sticky',
+                top: '0',
+                left: '0',
+                right: '0',
+                zIndex: 1,
+                padding: `${theme.spacing(1)} ${theme.spacing(2)}`,
+                backgroundColor: theme.palette.primary.main,
+
+            }}>
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Link href="/educator/course">
+                        <Button sx={{
+                            marginRight: theme.spacing(0.5),
+                            textTransform: 'none',
+                            boxShadow: 'none'
+                        }}
+                            variant="contained"
+                            startIcon={<ArrowBackIosNewIcon />}
+                        >
+                            <Typography variant="body1">Quay lại khóa học</Typography>
+                        </Button>
+                    </Link>
+                    <Chip
+                        variant="contained"
+                        color="error"
+                        label="Bản nháp" />
+                </Box>
+                <Button sx={{
+                    color: theme.palette.primary.contrastText,
+                    boxShadow: 'none'
+                }}
+                    variant="contained">
+                    <SettingsIcon />
+                </Button>
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'center', padding: theme.spacing(5, 2) }}>
+                <EditNavbarCourse />
+                <Outlet />
             </Box>
         </Box>
     );

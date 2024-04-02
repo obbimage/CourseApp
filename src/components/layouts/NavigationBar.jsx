@@ -4,12 +4,10 @@ import { Box, Divider, IconButton, List, ListItem, ListItemButton, ListItemIcon,
 import MuiDrawer from '@mui/material/Drawer';
 import AvatarLetter from './AvatarLetter';
 // icon
+import { AccountBox, LocalLibrary } from '@mui/icons-material';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import LogoutIcon from '@mui/icons-material/Logout';
-import MailIcon from '@mui/icons-material/Mail';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import { AccountBox, LocalLibrary } from '@mui/icons-material';
 import { Link } from 'react-router-dom';
 
 const drawerWidth = 240;
@@ -82,7 +80,7 @@ const listItemNavCourse = [
 ]
 const ItemComponent = ({ listItem, open }) => {
     return (
-        listItem.map((item,index) => {
+        listItem.map((item, index) => {
             return (
                 <Link key={index} to={item.url}
                     sx={{
@@ -146,7 +144,7 @@ export default function NavigationBar({ open, handleToggle, handleOnMouseEnter, 
                 </DrawerHeader>
                 <Divider />
                 <List>
-                    <ListItem disablePadding sx={{ display: 'block',color:'inherit'}} >
+                    <ListItem disablePadding sx={{ display: 'block', color: 'inherit' }} >
                         <ItemComponent
                             open={open}
                             listItem={listItemNavCourse} />

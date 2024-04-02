@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { stringAlert } from "../../static/stringAlert";
 import { getUser, login } from "../../api/auth";
 import { ROLE_EUDCATOR } from "../../api/config";
+import theme from "../../theme";
 
 
 export default function Login() {
@@ -38,9 +39,9 @@ export default function Login() {
         if (isValidate) {
             login(userName, password, 'educator')
                 .then((dataUser) => {
-                    if(dataUser){
+                    if (dataUser) {
                         console.log(dataUser)
-                    }else{
+                    } else {
                         setIsShowLoginFaile(true);
                     }
                 })
@@ -72,10 +73,21 @@ export default function Login() {
 
                 }}>
                 <Stack direction="column" spacing={2}>
-                    <Typography variant="title" sx={{ textAlign: 'center' }} >
-                        Đăng nhập
-                    </Typography>
-                    <Box display={isShowLoginFaile ? 'block':'none'}>
+                    <Box sx={{
+                        display:'flex',
+                        justifyContent:'center'
+                    }}>
+                        <Box sx={{
+                        width: '220px',
+                        borderRadius: '0 0 20px 20px',
+                        backgroundColor: theme.palette.primary.main,
+                        }}>
+                            <Typography variant="title" sx={{ textAlign: 'center', color: theme.palette.primary.contrastText }} >
+                                Đăng nhập
+                            </Typography>
+                        </Box>
+                    </Box>
+                    <Box display={isShowLoginFaile ? 'block' : 'none'}>
                         <Alert variant="filled" severity="error" >Tài Khoản hoặc mật khẩu không đúng vui lòng đăng nhập lại!</Alert>
                     </Box>
                     <TextField

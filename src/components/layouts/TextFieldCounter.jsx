@@ -12,9 +12,9 @@ export default function TextFieldCounter({ placeHolder, sx, onChange, value = ""
 
     return (
         <FormControl sx={sx}>
-            <OutlinedInput
+            <OutlinedInput sx={{height:'100%'}}
                 value={handleValue()}
-                endAdornment={<InputAdornment position="end">{60 - value.length}</InputAdornment>}
+                endAdornment={<InputAdornment position="end">{max - value.length}</InputAdornment>}
                 placeholder={placeHolder}
                 onChange={onChange} />
         </FormControl>
