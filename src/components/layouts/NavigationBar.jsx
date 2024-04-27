@@ -9,6 +9,10 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { Link } from 'react-router-dom';
+import { clearToken } from '../../hook/token';
+import { useContext } from 'react';
+import { CurrentUserContext } from '../../App';
+import AvatarCustom from './AvatarCustom';
 
 const drawerWidth = 240;
 const openedMixin = (theme) => ({
@@ -72,7 +76,6 @@ const itemNav = (name, iconComponent, url) => {
 
 const listItemNavAccount = [
     itemNav("Hồ sơ", <AccountBox />, "profile"),
-    itemNav("Đăng xuất", <LogoutIcon />, "logout")
 ];
 
 const listItemNavCourse = [
@@ -118,24 +121,30 @@ const ItemComponent = ({ listItem, open }) => {
     );
 }
 export default function NavigationBar({ open, handleToggle, handleOnMouseEnter, handleOnMuoseLeave }) {
+    const {currentUser,setCurrentUser} = useContext(CurrentUserContext);
     const theme = useTheme();
 
+    const handleLogOut = () => {
+        setCurrentUser({})
+        clearToken();
+    }
     return (
         <div onMouseEnter={handleOnMouseEnter} onMouseLeave={handleOnMuoseLeave}>
             <Drawer variant="permanent" open={open}>
                 <DrawerHeader>
-                    <Box flexGrow={1} display={open ? 'flex' : 'none'} justifyContent='flex-start'>
+                    <Box  flexGrow={1} display={open ? 'flex' : 'none'} justifyContent='flex-start'>
                         <Box sx={{
-                            width: '45px',
-                            height: '45px'
+                            width: '45px', 
+                            height: '45px',
                         }}>
-                            <AvatarLetter name='Sinh Tiến' />
+                            
+                            <AvatarCustom src={currentUser.avatar} name={`${currentUser.lastName} ${currentUser.firstName}`} />
                         </Box>
                         <Box sx={{
                             marginLeft: theme.spacing(1)
                         }}>
                             <Typography fontSize="13px" variant='subtitle1'>Xin chào!</Typography>
-                            <Typography fontSize='15px' variant='subtitle2'>Sinh Tiến</Typography>
+                            <Typography fontSize='15px' variant='subtitle2'>{currentUser.lastName} {currentUser.firstName}</Typography>
                         </Box>
                     </Box>
                     <IconButton onClick={handleToggle}>
@@ -156,6 +165,15 @@ export default function NavigationBar({ open, handleToggle, handleOnMouseEnter, 
                         <ItemComponent
                             open={open}
                             listItem={listItemNavAccount} />
+                        <ListItemButton
+                            onClick={handleLogOut}>
+                            <ListItemIcon>
+                                <LogoutIcon />
+                            </ListItemIcon>
+                            <ListItemText>
+                                Đăng xuất
+                            </ListItemText>
+                        </ListItemButton>
                     </ListItem>
                 </List>
             </Drawer>

@@ -3,20 +3,37 @@ import Search from "../../layouts/Search";
 import { DropDownMenu } from "../../layouts/DropDownMenu";
 import CardCourse from "./CardCourse";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { getCourseByUserId } from "../../../api/course";
+import { CurrentUserContext } from "../../../App";
 
 function itemSelectMenu(key, value) {
     return { key, value }
 }
 export default function EducatorCourse() {
+    // context
     const theme = useTheme();
+    const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
+
+    const [courses, setCourses] = useState([]);
     const [sort, setSort] = useState("");
+
     const listFillterMenu = [
         itemSelectMenu("Mới nhất", 'new'),
         itemSelectMenu("Cũ nhất", "old"),
         itemSelectMenu("A-Z", "ascending"), // tăng dần
         itemSelectMenu("Z-A", "decrease"),// giảm dần
     ]
+
+    useEffect(() => {
+        getCourseByUserId(currentUser.id)
+            .then((response) => {
+                if (response.status === 200) {
+                    const listCourse = response.data.data;
+                    setCourses(listCourse);
+                }
+            })
+    }, [currentUser.id]);
 
     const handleSelectSort = (value) => {
         setSort(value);
@@ -52,29 +69,21 @@ export default function EducatorCourse() {
             </Box>
 
             <Box sx={{ display: 'flex', flexWrap: 'wrap', flexDirection: 'row', margin: '0 -10px' }}>
-                <Box sx={{ margin: '10px' }}>
-                    <Link to="edit">
-                        <CardCourse />
-                    </Link>
-                </Box>
-                <Box sx={{ margin: '10px' }}>
-                    <CardCourse />
-                </Box>
-                <Box sx={{ margin: '10px' }}>
-                    <CardCourse />
-                </Box>
-                <Box sx={{ margin: '10px' }}>
-                    <CardCourse />
-                </Box>
-                <Box sx={{ margin: '10px' }}>
-                    <CardCourse />
-                </Box>
-                <Box sx={{ margin: '10px' }}>
-                    <CardCourse />
-                </Box>
-                <Box sx={{ margin: '10px' }}>
-                    <CardCourse />
-                </Box>
+                {
+                    courses.map((course) => {
+                        return (
+                            <Box key={course.id} sx={{ margin: '15px' }}>
+                                {/* <Link to="edit"> */}
+                                <CardCourse
+                                    courseId={course.id}
+                                    name={course.name}
+                                />
+                                {/* </Link> */}
+                            </Box>
+                        )
+                    })
+                }
+
             </Box>
         </Box>
     )

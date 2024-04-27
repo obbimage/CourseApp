@@ -1,9 +1,14 @@
-import { Box, Button, Link, Paper, Step, StepLabel, Stepper, Typography, useTheme } from "@mui/material";
-import { useState } from "react";
+import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Link, Paper, Slide, Step, StepLabel, Stepper, Typography, useTheme } from "@mui/material";
+import { forwardRef, useContext, useEffect, useState } from "react";
 import styled from "styled-components";
 import TextFieldCounter from "../../layouts/TextFieldCounter";
 import { useNavigate } from "react-router-dom";
 import { DropDownMenu } from "../../layouts/DropDownMenu";
+import CourseProvider, { CourseContext } from "../../../provider/CourseProvider";
+import { CurrentUserContext } from "../../../App";
+import { getAllCourseRole } from "../../../api/roleCourse";
+import { insertCourse } from "../../../api/course";
+import { setStorageCourseId } from "../../../util/localStorage";
 
 
 const steps = ['Tạo tiêu đề', 'Chọn Lĩnh vực'];
@@ -24,58 +29,102 @@ const Tab = styled(Box, { shouldForwarProp: (prop) => prop !== 'index' && prop !
     ({ theme, index, active }) => ({
         display: index == active ? 'flex' : 'none'
     })
-)
+);
+const Transition = forwardRef(function Transition(props, ref) {
+    return <Slide direction="up" ref={ref} {...props} />;
+});
 
 
 export default function CreateCourse() {
     const [activeStep, setActiveStep] = useState(0);
+    // course state
+    // dung de tao khoa hoc
     const [nameCourse, setNameCourse] = useState("");
     const [categoryCourse, setCategoryCourse] = useState("");
+    // dialog
+    const [openDialog,setOpenDialog] = useState(false);
+    // roles state
+    // danh sach role hien cos
+    const [roleCourse, setRoleCourse] = useState([]);
     const [allowNext, setAllowNex] = useState(false);
 
     const theme = useTheme();
-
+    // chuyển hướng trang
     const navigate = useNavigate();
+    //  context
+    const { courseProvider, setCourseProvider } = useContext(CourseContext);
+    const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
 
-    const rolesCourseString = ["", "Phát Triên", "Kinh doanh", "Tài chính & Kinh Tế", "CNTT & Phần mềm"];
 
-    const rolesCoursItem = (arrRole) => {
-        let item = arrRole.map((value) => {
-            return { value: value, key: value };
-        })
-        return item;
-    }
+    useEffect(() => {
+        getAllCourseRole()
+            .then(response => {
+                if (response.status === 200) {
+                    const data = response.data.data;
+                    const courseItem = data.map((role) => {
+                        return { value: role.id, key: role.name }
+                    });
+                    setRoleCourse(courseItem);
+                }
+            })
+    }, []);
+    // tra ve số tab hiện có
     const totalSteps = () => {
         return steps.length;
     }
 
-
+    // kiểm tra hiện tại có đang ở tab cuối cùng hay không
     const isLastSteps = () => {
         return activeStep === totalSteps() - 1;
     }
 
     const handleNext = (e) => {
-        
-        if(isLastSteps()){
-            navigate('/educator/course/edit')
-        }else{
-            setActiveStep(activeStep+1);
-        }
+
+        // if (isLastSteps()) {
+        //     navigate('/educator/course/edit')
+        // } else {
+        setActiveStep(activeStep + 1);
+        // }
+
+    }
+
+    const handleConfirm = (e) => {
+        let course = {
+            name: nameCourse,
+            roleId: categoryCourse
+        };
+        // console.log(course);
+        setCourseProvider(course);
+        insertCourse(currentUser.id, course)
+            .then(response => {
+                // neu thanh cong thi luu data vao context va chuyen sang trang moi
+                if (response.status === 200) {
+                    setCourseProvider(response.data.data);
+                    // lưu vào store để sử dụng cho trang sau
+                    setStorageCourseId(response.data.data.id);
+                    navigate('/educator/course/edit');
+                } else {
+                    // neu that bại thì bật dialog lên để thông báo
+                    setOpenDialog(true);
+                }
+            })
     }
 
     // kiểm tra nếu giá trị các thành phần trong step hợp lệ hay không
     const isAllowNex = () => {
         if (activeStep == 0 && nameCourse.length > 0) {
-            console.log(nameCourse.length>0)
             return true;
         }
-        if (activeStep == 1 && categoryCourse.length > 0) {
-            console.log(categoryCourse)
-            return true;
-        }
-
         return false;
     }
+
+    const isAllowConfirm = () => {
+        if (isLastSteps && categoryCourse !== "") {
+            return true;
+        }
+        return false;
+    }
+
 
     const handleBack = () => {
         setActiveStep((preActive) => preActive - 1);
@@ -85,11 +134,30 @@ export default function CreateCourse() {
         setNameCourse(e.target.value);
     }
 
-    const handleSelectCategoryCoure = (value) => {
+    const handleSelectCategoryCourse = (value) => {
         setCategoryCourse(value);
+    }
+
+    const handleCloseDialog = () => {
+        setOpenDialog(false);
     }
     return (
         <Box sx={{ width: '100%' }}>
+            <Dialog
+                open={openDialog}
+                TransitionComponent={Transition}
+                keepMounted
+                onClose={handleCloseDialog}
+                aria-describedby="alert-dialog-slide-description"
+            >
+                <DialogTitle>{"Thông báo"}</DialogTitle>
+                <DialogContent>
+                <Alert severity="error">Tạo khóa học thất bại</Alert>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDialog}>Đóng</Button>
+                </DialogActions>
+            </Dialog>
             <Paper sx={{
                 display: 'flex',
                 justifyContent: 'space-between',
@@ -103,7 +171,7 @@ export default function CreateCourse() {
                         {
                             steps.map((lable, index) => {
                                 return (
-                                    <Step>
+                                    <Step key={lable}>
                                         <StepLabel>
                                             {lable}
                                         </StepLabel>
@@ -169,8 +237,12 @@ export default function CreateCourse() {
                     marginTop: theme.spacing(5),
                     minWidth: '600px'
                 }}>
-                    <DropDownMenu ListItem={rolesCoursItem(rolesCourseString)}
-                        onChange={handleSelectCategoryCoure}
+                    {/* <DropDownMenu ListItem={rolesCoursItem(rolesCourseString)}
+                        onChange={handleSelectCategoryCourse}
+                    /> */}
+                    <DropDownMenu ListItem={roleCourse}
+                        defaultValue={"Chọn thể loại"}
+                        onChange={handleSelectCategoryCourse}
                     />
                 </Box>
             </Tab>
@@ -193,13 +265,24 @@ export default function CreateCourse() {
                     onClick={handleBack}>
                     Trước
                 </Button>
-                <Button sx={{
-                    margin: theme.spacing(1)
-                }}
-                    variant="contained"
-                    disabled={!isAllowNex()}
-                    onClick={handleNext}
-                >{!isLastSteps() ? 'Tiếp tục' : 'Hoàn thành'}</Button>
+                {
+                    !isLastSteps() ?
+                        <Button sx={{
+                            margin: theme.spacing(1)
+                        }}
+                            variant="contained"
+                            disabled={!isAllowNex()}
+                            onClick={handleNext}
+                        >{'Tiếp tục'}</Button>
+                        :
+                        <Button sx={{
+                            margin: theme.spacing(1)
+                        }}
+                            variant="contained"
+                            disabled={!isAllowConfirm()}
+                            onClick={handleConfirm}
+                        >{'Hoàn thành'}</Button>
+                }
             </Paper>
         </Box>
     )

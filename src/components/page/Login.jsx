@@ -1,66 +1,80 @@
 import { Alert, Box, Button, Link, Paper, Stack, TextField, Typography } from "@mui/material";
+import { useContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { loginEducator } from "../../api/auth";
+import useToken from "../../hook/token";
+import { stringAlert } from "../../static/stringAlert";
+import theme from "../../theme";
 import TextFieldPassword from "../layouts/TextFieldPassword";
 import TextLine from "../layouts/TextLine";
-import { useEffect, useState } from "react";
-import { stringAlert } from "../../static/stringAlert";
-import { getUser, login } from "../../api/auth";
-import { ROLE_EUDCATOR } from "../../api/config";
-import theme from "../../theme";
+import { CurrentUserContext } from "../../App";
+// import { CurrentUserContext } from "../../App";
 
 
-export default function Login() {
+export default function Login({ onLoginSuccess }) {
+
     const [userName, setUserName] = useState("");
     const [isNotValidUserName, setIsNotValidUserName] = useState(false); // dùng để toggle err input
     const [password, setPassword] = useState("");
     const [isNotValidPassword, setIsNotValidPassword] = useState(false) // dùng để toggle err input
     const [isShowLoginFaile, setIsShowLoginFaile] = useState(false); // toogle thông báo khi login faile
 
+    const { token, setToken } = useToken();
+    const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
+    const navigate = useNavigate();
+
     const handleChangeInputUser = (e) => {
         setUserName(e.target.value);
         setIsNotValidUserName(false); // tắt err
         setIsShowLoginFaile(false); // tắt alert faile
-    }
+    };
+
     const handleChangeInputPassword = (e) => {
         setPassword(e.target.value);
         setIsNotValidPassword(false); // tăt err
         setIsShowLoginFaile(false); // tắt alert faile
-    }
+    };
 
     const handleLogin = (e) => {
         let isValidate = true;
         if (!validateUserName()) {
             setIsNotValidUserName(true);
             isValidate = false;
-        }
+        };
         if (!validatePassword()) {
             setIsNotValidPassword(true);
             isValidate = false;
-        }
+        };
         if (isValidate) {
-            login(userName, password, 'educator')
-                .then((dataUser) => {
-                    if (dataUser) {
-                        console.log(dataUser)
+            loginEducator(userName, password)
+                .then((response) => {
+                    console.log(response)
+                    // nếu login thành công
+                    if (response.status === 200) {
+                        console.log(response)
+                        setToken(response.data.data.token);
+                        setCurrentUser(response.data.data.user)
+                        if (onLoginSuccess) {
+                            onLoginSuccess();
+                        }
                     } else {
                         setIsShowLoginFaile(true);
                     }
-                })
-        }
-
-
-    }
+                });
+        };
+    };
 
     const validateUserName = () => {
         if (userName)
             return true;
         return false;
-    }
+    };
 
     const validatePassword = () => {
         if (password)
             return true;
         return false;
-    }
+    };
 
     return (
         <Box flexGrow={1} display="flex" alignItems="center" justifyContent="center">
@@ -74,13 +88,13 @@ export default function Login() {
                 }}>
                 <Stack direction="column" spacing={2}>
                     <Box sx={{
-                        display:'flex',
-                        justifyContent:'center'
+                        display: 'flex',
+                        justifyContent: 'center'
                     }}>
                         <Box sx={{
-                        width: '220px',
-                        borderRadius: '0 0 20px 20px',
-                        backgroundColor: theme.palette.primary.main,
+                            width: '220px',
+                            borderRadius: '0 0 20px 20px',
+                            backgroundColor: theme.palette.primary.main,
                         }}>
                             <Typography variant="title" sx={{ textAlign: 'center', color: theme.palette.primary.contrastText }} >
                                 Đăng nhập
@@ -110,5 +124,5 @@ export default function Login() {
                 </Stack>
             </Paper>
         </Box>
-    )
-}
+    );
+};

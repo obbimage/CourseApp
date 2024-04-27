@@ -4,11 +4,28 @@ import { Box, Button, Chip, Link, Typography, useTheme } from "@mui/material";
 import EditNavbarCourse from "./NavEditbarCourse";
 import Intended from './editCourses/Intended';
 import { Outlet } from 'react-router-dom';
+import { useContext, useEffect } from 'react';
+import { CourseContext } from '../../../provider/CourseProvider';
+import { getStorageCourseId } from '../../../util/localStorage';
+import { getCourseById } from '../../../api/course';
 
 
 
 export default function EditCourse() {
     const theme = useTheme();
+
+    const { courseProvider, setCourseProvider } = useContext(CourseContext);
+
+    useEffect(() => {
+        const idCourse = getStorageCourseId();
+
+        if (idCourse !== null) {
+            getCourseById(idCourse)
+                .then(response => {
+                    setCourseProvider(response.data.data);
+                })
+        }
+    }, [])
 
     return (
         <Box sx={{ width: '100%' }}>
@@ -43,6 +60,9 @@ export default function EditCourse() {
                         variant="contained"
                         color="error"
                         label="Bản nháp" />
+                    <Typography sx={{ color: 'white', margin: theme.spacing(0, 1) }}>
+                        {courseProvider.name}
+                    </Typography>
                 </Box>
                 <Button sx={{
                     color: theme.palette.primary.contrastText,
