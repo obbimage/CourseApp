@@ -25,3 +25,26 @@ instance.interceptors.request.use(
         return Promise.reject(error);
     }
 );
+
+export async function handleApiRequest(request) {
+    try {
+        const response = await request();
+        return response;
+    } catch (err) {
+        console.log(err)
+        if (err.response) {
+            return err.response;
+        }
+        return null;
+    }
+}
+
+export function handleApiResponse(response, onSuccess, onFailure) {
+    if (response && response.status === 200) {
+        if (onSuccess)
+            onSuccess(); // goi ham neu thanh cong
+    } else {
+        if (onFailure)
+            onFailure(); // goi ham khi that bai
+    }
+}
