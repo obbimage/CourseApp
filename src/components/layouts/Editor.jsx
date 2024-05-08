@@ -1,16 +1,22 @@
 import { Editor } from "@tinymce/tinymce-react";
 import { apiKey } from "../../static/tiny";
 
-export default function TextEditor() {
+export default function TextEditor({ initialValue,onChange }) {
+    const handleOnchange = (value) => {
+        if (onChange) {
+            onChange(value);
+        }
+    }
+
     return (
         <Editor
             apiKey={apiKey}
-
-            initialValue="<p>This is the initial content of the editor</p>"
+            onEditorChange={handleOnchange}
+            initialValue={initialValue}
             init={{
                 plugins: 'link image code',
                 toolbar: 'undo redo | bold italic | alignleft aligncenter alignright | code'
             }}
         />
-    )
+    );
 }

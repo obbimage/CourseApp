@@ -14,10 +14,10 @@ const Title = ({ children }) => {
 export default function Pricing() {
     const theme = useTheme();
     const currency = [
-        dropDownItem('VND'),
+        dropDownItem(1, 'VND'),
     ];
     const price = [
-        dropDownItem('Miễn phí')
+        dropDownItem(1, 'Miễn phí')
     ];
 
     return (
@@ -30,29 +30,34 @@ export default function Pricing() {
             <WrapBoxEditLayoutCourse>
                 <WrapContentLayoutEditCourse>
                     <Title>Đặt giá cho khóa học của bạn</Title>
-                    <Typography>
+                    {/* <Typography>
                         Vui lòng chọn đơn vị tiền tệ và mức giá cho khóa học của bạn. Nếu bạn muốn cung cấp miễn phí khóa học của mình thì khóa học đó phải
                         có tổng thời lượng video dưới 2 giờ. Ngoài ra, các khóa học có bài kiểm tra thực hành không thể miễn phí.
+                    </Typography> */}
+                    <Typography>
+                        Vui lòng chọn đơn vị tiền tệ và mức giá cho khóa học của bạn.
                     </Typography>
                 </WrapContentLayoutEditCourse>
                 <WrapContentLayoutEditCourse >
                     <Box sx={{
-                        display:'flex'
+                        display: 'flex'
                     }}>
                         <Box width='100px' marginRight={theme.spacing(10)}>
-                            <DropDownMenu ListItem={currency}
-                            label={<Typography fontWeight='600'>Tiền tệ</Typography>} />
+                            <DropDownMenu
+                                value={currency}
+                                label={<Typography fontWeight='600'>Tiền tệ</Typography>} />
                         </Box>
                         <Box width='215px'>
-                            <DropDownMenu ListItem={price}
+                            <DropDownMenu 
+                            value={price}
                             label={<Typography fontWeight='600'>Mức giá</Typography>} />
                         </Box>
                     </Box>
                 </WrapContentLayoutEditCourse>
                 <WrapContentLayoutEditCourse>
-                    <Button variant="contained">
+                    {/* <Button variant="contained">
                         Lưu
-                    </Button>
+                    </Button> */}
                 </WrapContentLayoutEditCourse>
             </WrapBoxEditLayoutCourse>
         </LayoutEditCourse>

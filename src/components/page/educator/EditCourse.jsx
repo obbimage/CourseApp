@@ -64,17 +64,21 @@ export default function EditCourse() {
                         {courseProvider.name}
                     </Typography>
                 </Box>
-                <Button sx={{
+                <Link sx={{
                     color: theme.palette.primary.contrastText,
-                    boxShadow: 'none'
+                    boxShadow: 'none',
+                    cursor: 'pointer'
                 }}
-                    variant="contained">
+                href="setting"
+                >
                     <SettingsIcon />
-                </Button>
+                </Link>
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'center', padding: theme.spacing(5, 2) }}>
                 <EditNavbarCourse />
                 <Outlet />
+            </Box>
+            <Box>
             </Box>
         </Box>
     );

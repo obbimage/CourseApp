@@ -1,35 +1,25 @@
 import { Alert, Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, Link, Paper, Slide, Step, StepLabel, Stepper, Typography, useTheme } from "@mui/material";
 import { forwardRef, useContext, useEffect, useState } from "react";
-import styled from "styled-components";
-import TextFieldCounter from "../../layouts/TextFieldCounter";
 import { useNavigate } from "react-router-dom";
-import { DropDownMenu } from "../../layouts/DropDownMenu";
-import CourseProvider, { CourseContext } from "../../../provider/CourseProvider";
+import styled from "styled-components";
 import { CurrentUserContext } from "../../../App";
-import { getAllCourseRole } from "../../../api/roleCourse";
 import { insertCourse } from "../../../api/course";
+import { getAllCourseRole } from "../../../api/roleCourse";
+import { CourseContext } from "../../../provider/CourseProvider";
 import { setStorageCourseId } from "../../../util/localStorage";
+import { DropDownMenu } from "../../layouts/DropDownMenu";
+import TextFieldCounter from "../../layouts/TextFieldCounter";
+import { handleApiResponse } from "../../../api/instance";
 
 
 const steps = ['Tạo tiêu đề', 'Chọn Lĩnh vực'];
-
-// const Tab = ({ sx, children, index, active }) => {
-
-//     const isActive = () => {
-//         return index == active;
-//     }
-//     return (
-//         <Box sx={sx} display={isActive() ? 'flex' : 'none'}>
-//             {children}
-//         </Box>
-//     )
-// }
 
 const Tab = styled(Box, { shouldForwarProp: (prop) => prop !== 'index' && prop !== 'active' })(
     ({ theme, index, active }) => ({
         display: index == active ? 'flex' : 'none'
     })
 );
+
 const Transition = forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
@@ -42,10 +32,10 @@ export default function CreateCourse() {
     const [nameCourse, setNameCourse] = useState("");
     const [categoryCourse, setCategoryCourse] = useState("");
     // dialog
-    const [openDialog,setOpenDialog] = useState(false);
+    const [openDialog, setOpenDialog] = useState(false);
     // roles state
     // danh sach role hien cos
-    const [roleCourse, setRoleCourse] = useState([]);
+    const [rolesCourse, setRolesCourse] = useState([]);
     const [allowNext, setAllowNex] = useState(false);
 
     const theme = useTheme();
@@ -59,13 +49,11 @@ export default function CreateCourse() {
     useEffect(() => {
         getAllCourseRole()
             .then(response => {
-                if (response.status === 200) {
-                    const data = response.data.data;
-                    const courseItem = data.map((role) => {
-                        return { value: role.id, key: role.name }
-                    });
-                    setRoleCourse(courseItem);
-                }
+                handleApiResponse(response,
+                    (rolesResponse)=>{
+                        setRolesCourse(rolesResponse )
+                    }
+                )
             })
     }, []);
     // tra ve số tab hiện có
@@ -91,10 +79,13 @@ export default function CreateCourse() {
     const handleConfirm = (e) => {
         let course = {
             name: nameCourse,
-            roleId: categoryCourse
+            role: {
+                id: categoryCourse
+            }
         };
         // console.log(course);
         setCourseProvider(course);
+        console.log(course)
         insertCourse(currentUser.id, course)
             .then(response => {
                 // neu thanh cong thi luu data vao context va chuyen sang trang moi
@@ -112,7 +103,7 @@ export default function CreateCourse() {
 
     // kiểm tra nếu giá trị các thành phần trong step hợp lệ hay không
     const isAllowNex = () => {
-        if (activeStep == 0 && nameCourse.length > 0) {
+        if (activeStep === 0 && nameCourse.length > 0) {
             return true;
         }
         return false;
@@ -152,7 +143,7 @@ export default function CreateCourse() {
             >
                 <DialogTitle>{"Thông báo"}</DialogTitle>
                 <DialogContent>
-                <Alert severity="error">Tạo khóa học thất bại</Alert>
+                    <Alert severity="error">Tạo khóa học thất bại</Alert>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleCloseDialog}>Đóng</Button>
@@ -237,11 +228,9 @@ export default function CreateCourse() {
                     marginTop: theme.spacing(5),
                     minWidth: '600px'
                 }}>
-                    {/* <DropDownMenu ListItem={rolesCoursItem(rolesCourseString)}
-                        onChange={handleSelectCategoryCourse}
-                    /> */}
-                    <DropDownMenu ListItem={roleCourse}
-                        defaultValue={"Chọn thể loại"}
+                    <DropDownMenu
+                        value={rolesCourse}
+                        labelOption={"-----Thể loại-----"}
                         onChange={handleSelectCategoryCourse}
                     />
                 </Box>

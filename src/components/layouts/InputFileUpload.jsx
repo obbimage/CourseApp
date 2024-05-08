@@ -11,9 +11,9 @@ const InputFile = styled('input')({
   bottom: 0,
   zIndex: 1, // Đặt zIndex để input được ẩn phía sau nút button
 });
-export default function InputFileUpload({ label = "Upload a File", helperText, handleFiles }) {
+export default function InputFileUpload({ fileNameDefault = "", label = "Upload a File", helperText, handleFiles }) {
   const theme = useTheme();
-  const [fileName, setFileName] = useState("");
+  const [fileName, setFileName] = useState(fileNameDefault);
 
   const handleOnchange = (e) => {
     const files = e.target.files;
@@ -26,7 +26,7 @@ export default function InputFileUpload({ label = "Upload a File", helperText, h
 
   return (
     <Box>
-      <Typography sx={{ marginBottom: theme.spacing(2) }}>
+      <Typography sx={{ marginBottom: theme.spacing(0.5) }}>
         {fileName}
       </Typography>
       <Button sx={{
@@ -40,9 +40,73 @@ export default function InputFileUpload({ label = "Upload a File", helperText, h
       </Button>
       {
         helperText &&
-        <Typography>{helperText}</Typography>
+        <Typography sx={{ color: theme.palette.error.main }}>{helperText}</Typography>
       }
     </Box>
 
   );
 }
+
+export function InputFileVideoUpload({ fileNameDefault = "", label = "Upload a File", handleFiles, isFileVideo }) {
+  const [helperText, setHelperText] = useState(null);
+
+  const handleVideoFiles = (files) => {
+    const typeFile = files[0].type;
+    console.log(files[0].type)
+    if (typeFile.startsWith('video/')) {
+      if (handleFiles) {
+        handleFiles(files);
+        if (isFileVideo) {
+          handleFiles(null);
+          isFileVideo(true);
+        }
+      }
+    } else {
+      setHelperText("Vui lòng chọn một tệp video");
+      if (isFileVideo)
+        isFileVideo(false);
+    }
+  }
+  return (
+    <>
+      <InputFileUpload
+        fileNameDefault={fileNameDefault}
+        label={label}
+        helperText={helperText}
+        handleFiles={handleVideoFiles} />
+    </>
+  )
+}
+
+
+export function InputFileImgUpload({ fileNameDefault = "", label = "Upload a File", handleFiles, isFileImg }) {
+  const [helperText, setHelperText] = useState(null);
+
+  const handleImgFiles = (files) => {
+    const typeFile = files[0].type;
+    console.log(files[0].type)
+    if (typeFile.startsWith('image/')) {
+      if (handleFiles) {
+        handleFiles(files);
+        if (isFileImg) {
+          handleFiles(null);
+          isFileImg(true);
+        }
+      }
+    } else {
+      setHelperText("Vui lòng chọn một tệp ảnh");
+      if (isFileImg)
+        isFileImg(false)
+    }
+  }
+  return (
+    <>
+      <InputFileUpload
+        fileNameDefault={fileNameDefault}
+        label={label}
+        helperText={helperText}
+        handleFiles={handleImgFiles} />
+    </>
+  )
+}
+

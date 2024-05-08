@@ -6,9 +6,10 @@ import { Link } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import { getCourseByUserId } from "../../../api/course";
 import { CurrentUserContext } from "../../../App";
+import { handleApiResponse } from "../../../api/instance";
 
-function itemSelectMenu(key, value) {
-    return { key, value }
+function itemSelectMenu(id, name) {
+    return { id, name }
 }
 export default function EducatorCourse() {
     // context
@@ -18,20 +19,21 @@ export default function EducatorCourse() {
     const [courses, setCourses] = useState([]);
     const [sort, setSort] = useState("");
 
-    const listFillterMenu = [
-        itemSelectMenu("Mới nhất", 'new'),
-        itemSelectMenu("Cũ nhất", "old"),
-        itemSelectMenu("A-Z", "ascending"), // tăng dần
-        itemSelectMenu("Z-A", "decrease"),// giảm dần
+    const listFilterMenu = [
+        itemSelectMenu(1, "Mới nhất"),
+        itemSelectMenu(2, "Cũ nhất"),
+        itemSelectMenu(3, "A-Z"), // tăng dần
+        itemSelectMenu(4, "Z-A"),// giảm dần
     ]
 
     useEffect(() => {
         getCourseByUserId(currentUser.id)
-            .then((response) => {
-                if (response.status === 200) {
-                    const listCourse = response.data.data;
-                    setCourses(listCourse);
-                }
+            .then(response => {
+                handleApiResponse(response,
+                    (coursesResponse) => {
+                        setCourses(coursesResponse);
+                    }
+                )
             })
     }, [currentUser.id]);
 
@@ -58,7 +60,8 @@ export default function EducatorCourse() {
                     display: 'flex',
                 }}>
                     <Search />
-                    <DropDownMenu ListItem={listFillterMenu}
+                    <DropDownMenu
+                        value={listFilterMenu}
                         onChange={handleSelectSort} />
                 </Box>
                 <Link to="create" sx={{ height: '100%' }}>
@@ -72,11 +75,10 @@ export default function EducatorCourse() {
                 {
                     courses.map((course) => {
                         return (
-                            <Box key={course.id} sx={{ margin: '15px' }}>
+                            <Box key={course.id} sx={{ margin: '15px', width: '300px' }}>
                                 {/* <Link to="edit"> */}
                                 <CardCourse
-                                    courseId={course.id}
-                                    name={course.name}
+                                    course={course}
                                 />
                                 {/* </Link> */}
                             </Box>

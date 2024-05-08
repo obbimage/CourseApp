@@ -1,27 +1,54 @@
-import { Button, Card, CardActions, CardContent, CardMedia, Link, Typography } from "@mui/material";
+import { Box, Button, Card, CardActions, CardContent, CardMedia, Chip, Link, Typography } from "@mui/material";
 import { setStorageCourseId } from "../../../util/localStorage";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
-export default function CardCourse({courseId, name }) {
-    const navigate = useNavigate();
+// const ChipComplete = (isComplete)=>{
+
+//     return(
+//         <>
+//         <Chip
+//             color={isComplete ? "success":"error"}
+//             label={isComplete ? ""}
+//         />
+//         </>
+//     )
+// }
+
+export default function CardCourse({ course }) {
+    const navigate = useNavigate()
 
     const handleEdit = () => {
+        let courseId = course.id;
         setStorageCourseId(courseId);
         navigate('edit');
     }
+
     return (
         // 345px
-        <Card sx={{ maxWidth: 300 }}>
+        <Card sx={{ width: '100%' }}>
             <CardMedia sx={{ height: 140 }}
-                image={`${process.env.PUBLIC_URL}/imgs/cover.jpg`}
+                image={course.img || `${process.env.PUBLIC_URL}/imgs/cover.jpg`}
                 title="image course" />
             <CardContent>
+                <Box>
+                    <Box sx={{
+                        display: course.complete ? 'none' : 'inline-block'
+                    }}>
+                        <Chip
+                            color="error"
+                            label="Bản nháp"
+                        />
+                    </Box>
+                </Box>
                 <Typography gutterBottom variant="h5" component="div">
-                    {name || 'underfind'}
+                    {course.name || 'underfind'}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
-                    Lizards are a widespread group of squamate reptiles, with over 6,000
-                    species, ranging across all continents except Antarctica
+                    Ngày tạo:  {course.dateUpload}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                    {course.summary}
                 </Typography>
             </CardContent>
             <CardActions>

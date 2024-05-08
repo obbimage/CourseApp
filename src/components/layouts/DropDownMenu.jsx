@@ -1,63 +1,66 @@
 import { ResetTvRounded } from "@mui/icons-material";
-import { FormControl, FormHelperText, InputLabel, MenuItem, Select } from "@mui/material";
+import { FormControl, FormHelperText, InputLabel, MenuItem, NativeSelect, Select } from "@mui/material";
 import { useEffect, useState } from "react";
+import theme from "../../theme";
 
-export const dropDownItem = (key, value) => {
+export const dropDownItem = (id, name) => {
 
     return ({
-        key, value
+        id, name
     });
 }
 
-export function DropDownMenu({ ListItem, onChange, label, defaultValue }) {
-    const [value, setValue] = useState("");
-
+export function DropDownMenu({ labelOption, value, onChange, label, defaultValue }) {
+    const [selectValue, setSelectValue] = useState("");
+    const [valueState, setValueState] = useState(value || []);
 
     const handleSelect = (e) => {
-        setValue(e.target.value);
+        let value = e.target.value
+        setSelectValue(value);
+        if (onChange) {
+            onChange(value);
+        }
     }
 
     useEffect(() => {
-        onChange && onChange(value);
+        if (value !== undefined)
+            setValueState(value)
     }, [value]);
 
+    useEffect(() => {
+        setSelectValue(defaultValue || "");
+    }, [defaultValue])
     // trong lần render đầu tiên
     // nếu List item tồn tại thì mặc định trong select sẽ hiển thị phần tử đầu tiên
     useEffect(() => {
-        if (ListItem && ListItem.length > 0) {
-            if (defaultValue) {
-                setValue(defaultValue);
-            } else {
-                setValue(ListItem[0].value);
-            }
-        }
     }, []);
+
     return (
         <FormControl sx={{ height: '100%', width: '100%', minWidth: 120, boxSizing: 'border-box' }}
             variant="standard">
             <label>{label}</label>
-            <Select
-                sx={{ height: '100%' }}
-                value={value}
+            <NativeSelect
+                sx={{
+                    height: '100%',
+                    marginTop: theme.spacing(1)
+                }}
+                value={selectValue}
                 onChange={handleSelect}
-                displayEmpty={true}
                 inputProps={{ 'aria-label': 'Without label' }}
             >
                 {
-                    defaultValue &&
-                    <MenuItem value="">{defaultValue}</MenuItem>
+                    labelOption &&
+                    <option value="">{labelOption}</option>
                 }
                 {
-
-                    ListItem && ListItem.length > 0 &&
-                    ListItem.map((item, index) => {
+                    valueState.map((item) => {
                         return (
-                            <MenuItem key={index} value={item.value}>{item.key}</MenuItem>
+                            <option key={item.id} value={item.id}>{item.name}</option>
                         )
                     })
                 }
-            </Select>
-            {/* <FormHelperText>Without label</FormHelperText> */}
+
+            </NativeSelect>
         </FormControl>
     )
 }

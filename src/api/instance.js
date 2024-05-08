@@ -39,12 +39,17 @@ export async function handleApiRequest(request) {
     }
 }
 
-export function handleApiResponse(response, onSuccess, onFailure) {
+export function handleApiResponse(response, onSuccess, onFailure, onComplete) {
     if (response && response.status === 200) {
-        if (onSuccess)
-            onSuccess(); // goi ham neu thanh cong
+        if (onSuccess) {
+            const data = response.data.data;
+            onSuccess(data); // goi ham neu thanh cong
+        }
     } else {
         if (onFailure)
-            onFailure(); // goi ham khi that bai
+            onFailure(response); // goi ham khi that bai
+    }
+    if (onComplete) {
+        onComplete();
     }
 }

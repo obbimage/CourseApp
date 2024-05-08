@@ -8,6 +8,7 @@ import theme from "../../theme";
 import TextFieldPassword from "../layouts/TextFieldPassword";
 import TextLine from "../layouts/TextLine";
 import { CurrentUserContext } from "../../App";
+import { handleApiResponse } from "../../api/instance";
 // import { CurrentUserContext } from "../../App";
 
 
@@ -17,7 +18,7 @@ export default function Login({ onLoginSuccess }) {
     const [isNotValidUserName, setIsNotValidUserName] = useState(false); // dùng để toggle err input
     const [password, setPassword] = useState("");
     const [isNotValidPassword, setIsNotValidPassword] = useState(false) // dùng để toggle err input
-    const [isShowLoginFaile, setIsShowLoginFaile] = useState(false); // toogle thông báo khi login faile
+    const [isShowLoginFaile, setIsShowLoginFailed] = useState(false); // toogle thông báo khi login faile
 
     const { token, setToken } = useToken();
     const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
@@ -26,13 +27,13 @@ export default function Login({ onLoginSuccess }) {
     const handleChangeInputUser = (e) => {
         setUserName(e.target.value);
         setIsNotValidUserName(false); // tắt err
-        setIsShowLoginFaile(false); // tắt alert faile
+        setIsShowLoginFailed(false); // tắt alert faile
     };
 
     const handleChangeInputPassword = (e) => {
         setPassword(e.target.value);
         setIsNotValidPassword(false); // tăt err
-        setIsShowLoginFaile(false); // tắt alert faile
+        setIsShowLoginFailed(false); // tắt alert faile
     };
 
     const handleLogin = (e) => {
@@ -48,18 +49,18 @@ export default function Login({ onLoginSuccess }) {
         if (isValidate) {
             loginEducator(userName, password)
                 .then((response) => {
-                    console.log(response)
-                    // nếu login thành công
-                    if (response.status === 200) {
-                        console.log(response)
-                        setToken(response.data.data.token);
-                        setCurrentUser(response.data.data.user)
-                        if (onLoginSuccess) {
-                            onLoginSuccess();
+                    handleApiResponse(response,
+                        (data) => {
+                            setToken(data.token);
+                            setCurrentUser(data.user)
+                            if (onLoginSuccess) {
+                                onLoginSuccess();
+                            }
+                        },
+                        () => {
+                            setIsShowLoginFailed(true);
                         }
-                    } else {
-                        setIsShowLoginFaile(true);
-                    }
+                    )
                 });
         };
     };

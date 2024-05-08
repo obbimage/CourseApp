@@ -4,7 +4,14 @@ const URL_UNIT = '/unit';
 
 export async function insertUnits(courseId, units) {
     return handleApiRequest(async ()=>{
-        return await  await instance.post(`${URL_UNIT}/inserts/course/${courseId}`, units);
+        return  await instance.post(`${URL_UNIT}/inserts/course/${courseId}`, units);
+    })
+}
+
+export async function insertUnit(courseId,unit){
+    console.log('newUnit',unit)
+    return handleApiRequest(async ()=>{
+        return await instance.post(`${URL_UNIT}/insert/course/${courseId}`,unit);
     })
 }
 

@@ -18,6 +18,7 @@ import StructureCourse from "../page/educator/editCourses/StructureCourse";
 import { useContext, useEffect, useState } from "react";
 import { CurrentUserContext } from "../../App";
 import useToken from "../../hook/token";
+import Setting from "../page/educator/editCourses/Setting";
 
 export default function Routers() {
   const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
@@ -37,6 +38,7 @@ export default function Routers() {
   const handleLoginSuccess = () => {
     console.log('login success')
     if (preLocation) {
+      console.log(preLocation);
       navigate(preLocation);
     } else {
       navigate("/");
@@ -58,6 +60,8 @@ export default function Routers() {
         <Route path="curriculum" element={<Curriculum />} />
         <Route path="landingPage" element={<LadingPage />} />
         <Route path="pricing" element={<Pricing />} />
+        <Route path="setting" element={<Setting/>} />
+
       </Route>
       <Route path="/educator" element={<Educator />}>
         <Route path="profile" element={<EducatorProfile />} />

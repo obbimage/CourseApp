@@ -1,8 +1,10 @@
-import { List, ListItem, ListItemButton, Typography, styled } from "@mui/material";
+import { Button, List, ListItem, ListItemButton, Typography, styled } from "@mui/material";
 import { Box, useTheme } from "@mui/system";
 import CheckIcon from '@mui/icons-material/Check';
-import { Link } from "react-router-dom";
-
+import { Link, NavLink, useLocation } from "react-router-dom";
+import { useEffect } from "react";
+import { grey } from "@mui/material/colors";
+import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 const objNavLink = (name, url = '#') => {
     return ({ name, url });
 };
@@ -12,9 +14,9 @@ const listCreateContent = [
 
 ];
 const listPublicCourse = [
-    objNavLink("Trang tổng quan khóa học","landingPage"),
-    objNavLink("Định giá","pricing"),
-    objNavLink("Tin nhắn khóa học")
+    objNavLink("Trang tổng quan khóa học", "landingPage"),
+    objNavLink("Định giá", "pricing"),
+    // objNavLink("Tin nhắn khóa học")
 ];
 
 const listPlantCourse = [
@@ -36,14 +38,22 @@ const CircleCheck = styled('span')
 
     }));
 
+const NavLinkStyled = styled(NavLink)(({ theme, isActive }) => ({
+    // Các kiểu mặc định của bạn ở đây
+    display: 'block',
+    padding: theme.spacing(1),
+    backgroundColor: isActive ? grey[200] : 'inherit', // Thay đổi màu dựa trên isActive
+    // Các kiểu bổ sung
+}));
 
-const CustomLink = ({ children, to }) => {
+const CustomLink = ({ children, to, isActive }) => {
     return (
-        <Link to={to} >
+        <NavLinkStyled to={to} isActive={isActive}>
             {children}
-        </Link>
+        </NavLinkStyled>
     );
 }
+
 
 const Title = ({ children }) => {
 
@@ -56,8 +66,27 @@ const Title = ({ children }) => {
     )
 }
 
+const ListItemCustom = ({ name }) => {
+    return (
+        <>
+            <ListItem disablePadding>
+                {/* <CircleCheck>
+                    <CheckIcon sx={{ width: '80%' }} />
+                </CircleCheck> */}
+                <AddCircleOutlineOutlinedIcon/>
+                <Typography sx={{marginLeft: '3px'}}>{name}</Typography>
+            </ListItem>
+        </>
+    )
+}
+
 export default function EditNavbarCourse() {
     const theme = useTheme();
+    const location = useLocation();
+
+    useEffect(() => {
+        console.log(location.pathname)
+    }, [location])
     return (
         <Box marginTop={theme.spacing(4)} marginRight={theme.spacing(4)} maxWidth={"260px"}>
             <Title>Lên kế hoạch cho khóa học của bạn</Title>
@@ -65,16 +94,11 @@ export default function EditNavbarCourse() {
                 listPlantCourse.map((item) => {
                     return (
                         <CustomLink
+                            isActive={location.pathname.includes(item.url)}
                             to={item.url}
                             key={item.name}>
-                            <ListItem disablePadding>
-                                <ListItemButton sx={{ display: 'flex', alignItems: 'center', px: '0' }}>
-                                    <CircleCheck>
-                                        <CheckIcon sx={{ width: '80%' }} />
-                                    </CircleCheck>
-                                    <Typography>{item.name}</Typography>
-                                </ListItemButton>
-                            </ListItem>
+                            <ListItemCustom
+                                name={item.name} />
                         </CustomLink>
                     )
                 })
@@ -85,16 +109,11 @@ export default function EditNavbarCourse() {
                     listCreateContent.map((item) => {
                         return (
                             <CustomLink
+                                isActive={location.pathname.includes(item.url)}
                                 key={item.name}
                                 to={item.url}>
-                                <ListItem disablePadding>
-                                    <ListItemButton sx={{ display: 'flex', alignItems: 'center', px: '0' }}>
-                                        <CircleCheck>
-                                            <CheckIcon sx={{ width: '80%' }} />
-                                        </CircleCheck>
-                                        <Typography>{item.name}</Typography>
-                                    </ListItemButton>
-                                </ListItem>
+                                <ListItemCustom
+                                    name={item.name} />
                             </CustomLink>
                         )
                     })
@@ -106,22 +125,23 @@ export default function EditNavbarCourse() {
                     listPublicCourse.map((item) => {
                         return (
                             <CustomLink
+                                isActive={location.pathname.includes(item.url)}
                                 key={item.name}
                                 to={item.url}
                             >
-                                <ListItem disablePadding>
-                                    <ListItemButton sx={{ display: 'flex', alignItems: 'center', px: '0' }}>
-                                        <CircleCheck>
-                                            <CheckIcon sx={{ width: '80%' }} />
-                                        </CircleCheck>
-                                        <Typography>{item.name}</Typography>
-                                    </ListItemButton>
-                                </ListItem>
+                                <ListItemCustom
+                                    name={item.name} />
                             </CustomLink>
                         )
                     })
                 }
             </List>
+
+            <Box>
+                <Button variant="contained">
+                    Gửi xét duyệt 
+                </Button>
+            </Box>
         </Box>
     )
 }
