@@ -17,3 +17,7 @@ export function stringToColor(string) {
 
     return color;
 }
+
+export function containsOnlySpaces(input) {
+    return /^\s*$/.test(input);
+}

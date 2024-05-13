@@ -9,27 +9,7 @@ export async function insertCourse(userId, course) {
 };
 
 
-// export async function insertStudyWillLearnFromCourse(courseId, studentWillLearns){
-//     try{
-//         const request = studentWillLearns.map((studentWillLearn,index)=>{
-//             return{
-//                 content: studentWillLearn,
-//                 // course:{
-//                 //     id:courseId
-//                 // }
-//             }
-//         });
-//         console.log(request)
-//         const response = instance.post(`${URL_COURSE}/${courseId}/insert/studyWillLearn`,request);
-//         return response;
-//     }catch(err){
-//         console.error(err);
-//         if(err.response){
-//             return{status:err.response.status};
-//         }
-//         return null;
-//     }
-// }
+
 
 export async function insertImgCourse(courseId, fileImg){
     let formData = new FormData();

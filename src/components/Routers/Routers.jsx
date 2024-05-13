@@ -19,6 +19,14 @@ import { useContext, useEffect, useState } from "react";
 import { CurrentUserContext } from "../../App";
 import useToken from "../../hook/token";
 import Setting from "../page/educator/editCourses/Setting";
+import LoginAdmin from "../page/admin/LoginAdmin";
+import SignUpAdmin from "../page/admin/SignupAdmin";
+import AdminPage from "../page/admin/AdminPage";
+import AdminProfile from "../page/admin/ProfileAdmin";
+import Data from "../page/admin/Data";
+import MangerCourse from "../page/admin/MangerCourse";
+import DetailsCourse from "../page/admin/layout/DetailsCourse";
+import Char from "../page/admin/Char";
 
 export default function Routers() {
   const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
@@ -29,7 +37,7 @@ export default function Routers() {
 
   useEffect(() => {
     // nêu không đăng nhập và truy cập các trang trước đó
-    if (!token && location.pathname !== '/login' && location.pathname !== '/signup') {
+    if (!token && location.pathname !== '/login' && location.pathname !== '/signup' && location.pathname !== '/login/admin') {
       setPreLocation(location.pathname) // luu tru trang truoc do
       navigate('/login');
     }
@@ -60,13 +68,21 @@ export default function Routers() {
         <Route path="curriculum" element={<Curriculum />} />
         <Route path="landingPage" element={<LadingPage />} />
         <Route path="pricing" element={<Pricing />} />
-        <Route path="setting" element={<Setting/>} />
-
+        <Route path="setting" element={<Setting />} />
       </Route>
       <Route path="/educator" element={<Educator />}>
         <Route path="profile" element={<EducatorProfile />} />
         <Route path='course' element={<EducatorCourse />}>
         </Route>
+      </Route>
+      <Route path="/login/admin" element={<LoginAdmin onLoginSuccess={handleLoginSuccess} />} />
+      {/* <Route path="/signup/admin" element={<SignUpAdmin />} /> */}
+      <Route path="admin" element={<AdminPage />}>
+        <Route path="data" element={<Data />} />
+        <Route path="course" element={<MangerCourse />} />
+        <Route path="course/review" element={<DetailsCourse />} />
+        <Route path="profile" element={<AdminProfile />} />
+        <Route path="char" element={<Char />} />
       </Route>
     </Routes>
   )

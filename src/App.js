@@ -21,6 +21,9 @@ function App() {
 
 
   const theme = useTheme();
+  useEffect(()=>{
+    console.log(theme)
+  },[])
 
   // điều hướng page
   const navigate = useNavigate();

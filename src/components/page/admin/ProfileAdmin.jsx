@@ -64,9 +64,9 @@ const InfoTotal = ({ user, onClickButtonAvatar }) => {
         <Typography sx={{ marginTop: '2px' }} textAlign='center'>User name: {user.username}</Typography>
       </Box>
       <Divider />
-      <InfoBox text="Khóa học đã tạo: " />
+      {/* <InfoBox text="Khóa học đã tạo: " />
       <Divider />
-      <InfoBox text="Khóa học đã bán: " />
+      <InfoBox text="Khóa học đã bán: " /> */}
       <Divider />
       <Box sx={{
         display: 'flex',
@@ -142,7 +142,7 @@ const Input = styled(InputBase)
     },
   }));
 
-const CustomeTextField = ({ label, defaultValue, value, disabled, onChange }) => {
+const CustomTextField = ({ label, defaultValue, value, disabled, onChange }) => {
   return (
     <FormControl sx={{ width: '100%' }} variant="standard">
       <InputLabel sx={{ fontSize: '22px' }} shrink htmlFor="name-input">
@@ -173,7 +173,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default function EducatorProfile() {
+export default function AdminProfile() {
   const theme = useTheme();
 
   const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
@@ -207,7 +207,6 @@ export default function EducatorProfile() {
     ItemTextFiled("country", "Đất nước", currentUser.country),
     ItemTextFiled("zipCode", "Mã bưu chính", currentUser.zipCode),
     ItemTextFiled("zipCodeCountry", "Thành Phố", currentUser.zipCodeCountry),
-    ItemTextFiled("profession", "Nghề nghiệp", currentUser.zipCodeCountry),
 
   ]
 
@@ -415,7 +414,7 @@ export default function EducatorProfile() {
                   ListTextField.map((item) => {
                     return (
                       <Grid xs={6} key={item.key}>
-                        <CustomeTextField
+                        <CustomTextField
                           onChange={(event) => handleChangeInput(event, item.key)}
                           disabled={isNotAllowEdit}
                           label={item.label}
@@ -435,13 +434,13 @@ export default function EducatorProfile() {
                       fontSize: '22px'
                     },
                   }} >
-                    <InputLabel shrink>Tiểu sử</InputLabel>
+                    {/* <InputLabel shrink>Tiểu sử</InputLabel>
                     <TextareaAutosize disabled={isNotAllowEdit}
                       onChange={handleOnchangeTextArea}
-                      value={editUser.educator?.description || ""}
+                      value={editUser.educator.description || ""}
                       style={{ resize: 'none', width: '100%', padding: '10px', outline: 'none' }}
                       minRows={7}
-                    />
+                    /> */}
                   </FormControl>
                 </Grid>
               </Grid>

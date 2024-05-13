@@ -2,24 +2,19 @@ import { handleApiRequest, instance } from "./instance";
 
 const ROLE_USER = 'user';
 const ROLE_EDUCATOR = 'educator'
+const URL_REGISTER = '/register';
+const URL_LOGIN = '/auth'
+
+const loginRequest = (userName, password) => {
+    return {
+        username: userName,
+        password: password
+    }
+}
 
 async function login(username, password, role = ROLE_USER) {
 
-    // try {
-    //     const response = await instance.post(`/auth/${role}`, {
-    //         username: username,
-    //         password: password
-    //     });
-
-    //     return response;
-    // } catch (err) {
-    //     console.error("login faile: ", err);
-    //     if (err.response)
-    //         return err.response;
-    //     return null;
-    // }
-
-    return handleApiRequest(async ()=>{
+    return handleApiRequest(async () => {
         return await instance.post(`/auth/${role}`, {
             username: username,
             password: password
@@ -41,14 +36,31 @@ async function register(username, password, role) {
         return null;
 
     }
-}
+};
 
 export async function loginEducator(username, password) {
     return await login(username, password, ROLE_EDUCATOR);
-}
+};
 
+export async function loginAdmin(username, password) {
+    return handleApiRequest(async () => {
+        return await instance.post(`${URL_LOGIN}/admin`, loginRequest(username, password));
+    })
+
+}
 export async function registerEducator(username, password) {
     return register(username, password, ROLE_EDUCATOR)
+};
+
+export async function registerAdmin(username, password) {
+    const user = {
+        username: username,
+        password: password
+    }
+
+    return handleApiRequest(async () => {
+        return await instance.post(`${URL_REGISTER}/admin`, user);
+    })
 }
 
 export async function getUser() {

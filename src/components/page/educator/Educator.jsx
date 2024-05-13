@@ -7,33 +7,33 @@ import NavigationBar from "../../layouts/NavigationBar";
 
 
 export default function Educator() {
-    const [openNavgationBar, setOpenNavgatioBar] = useState(false);
+    const [openNavigationBar, setOpenNavigationBar] = useState(false);
 
 
     const handleToggleNavbar = () => {
-        setOpenNavgatioBar(!openNavgationBar);
+        setOpenNavigationBar(!openNavigationBar);
     }
 
     const handleOnMouseEnter = () => {
-        setOpenNavgatioBar(true);
+        setOpenNavigationBar(true);
     }
 
-    const handleOnMuoseLeave = () => {
-        setOpenNavgatioBar(false);
+    const handleOnMouseLeave = () => {
+        setOpenNavigationBar(false);
     }
     const handleMenuIcon = () => {
-        setOpenNavgatioBar(true);
+        setOpenNavigationBar(true);
     }
     return (
         <Box sx={{ display: 'flex', flexDirection: 'row', width: '100%', height: '100%' }}>
             <NavigationBar
-                open={openNavgationBar}
-                // handleToggle={handleToggleNavbar}
+                open={openNavigationBar}
                 handleOnMouseEnter={handleOnMouseEnter}
-                handleOnMuoseLeave={handleOnMuoseLeave}
+                handleOnMouseLeave={handleOnMouseLeave}
             />
             <Box display='flex' flexDirection='column' flexGrow={1}>
                 <Header
+                    name={"EDUCATOR"}
                     onClickMenuIcon={handleMenuIcon}
                 ></Header>
                 <Box flexGrow={1}>

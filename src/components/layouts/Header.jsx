@@ -30,7 +30,7 @@ const HeaderBadge = ({ children, ariaHaspopup = "false", ariaControls = {}, onCl
         </Badge>
     )
 }
-export default function Header({ onClickMenuIcon }) {
+export default function Header({ onClickMenuIcon, name }) {
     const [anchorEl, setAnchorEl] = useState(null);
     const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = useState(null);
 
@@ -69,8 +69,8 @@ export default function Header({ onClickMenuIcon }) {
             id={menuId}
             open={isMenuOpen}
             onClose={handleMenuClose}>
-            <MenuItem>Profile</MenuItem>
-            <MenuItem>My Account</MenuItem>
+            {/* <MenuItem>Profile</MenuItem>
+            <MenuItem>My Account</MenuItem> */}
         </Menu>)
     const mobileMenuId = 'primary-search-account-menu-mobile';
     const renderMobileMenu = (
@@ -89,7 +89,7 @@ export default function Header({ onClickMenuIcon }) {
             open={isMobileMenuOpen}
             onClose={handleMobileMenuClose}
         >
-            <MenuItem>
+            {/* <MenuItem>
                 <IconButton size="large" aria-label="show 4 new mails" color="inherit">
                     <Badge badgeContent={4} color="error">
                         <MailIcon />
@@ -120,7 +120,7 @@ export default function Header({ onClickMenuIcon }) {
                     <AccountCircle />
                 </IconButton>
                 <p>Profile</p>
-            </MenuItem>
+            </MenuItem> */}
         </Menu>
     );
 
@@ -141,12 +141,12 @@ export default function Header({ onClickMenuIcon }) {
                     variant="h6"
                     noWrap
                     component='div'>
-                        Educator
+                        {name}
                     </Typography>
                     <Box display="flex" flexGrow={1}>
                         {/* display pc */}
                         <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' }, justifyContent: "flex-end" }}>
-                            <HeaderIconButton>
+                            {/* <HeaderIconButton>
                                 <HeaderBadge>
                                     <MailIcon />
                                 </HeaderBadge>
@@ -161,7 +161,7 @@ export default function Header({ onClickMenuIcon }) {
                                 ariaHaspopup="true"
                                 onClick={handleProfileMenuOpen}>
                                 <AccountCircle />
-                            </HeaderIconButton>
+                            </HeaderIconButton> */}
                         </Box>
                         <Box sx={{ display: { xs: 'flex', md: 'none' }, flexGrow: 1, justifyContent: 'flex-end' }}>
                             <IconButton

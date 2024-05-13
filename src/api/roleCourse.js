@@ -8,9 +8,16 @@ export async function getAllCourseRole() {
     });
 };
 
-// export async function getRoleCourseByCourseId(courseId){
-//     return handleApiRequest(async ()=>{
-//         return await instance.get(`${URL_ROLE}/course/${courseId}`);
-//     });
-// }
+
+export async function getCourseRoleById(roleId) {
+    return handleApiRequest(async () => {
+        return await instance.get(`${URL_ROLE}/${roleId}`);
+    })
+};
+
+export async function insertCourseRole(role) {
+    return handleApiRequest(async () => {
+        return await instance.post(`${URL_ROLE}`, role);
+    })
+}
 
