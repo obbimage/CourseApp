@@ -9,6 +9,7 @@ import Login from './components/page/Login';
 import useToken from './hook/token';
 import { loginEducator } from './api/auth';
 import CourseProvider from './provider/CourseProvider';
+import UserApp from './components/page/user/UserApp';
 
 export const CurrentUserContext = createContext({});
 
@@ -61,7 +62,8 @@ function App() {
           // justifyContent: 'center'
         }}>
           {/* {isObjEmpty(currentUser) ? <Login /> : <Routers />} */}
-          <Routers/>
+          {/* <Routers/> */}
+          <UserApp/>
         </Box>
       </CourseProvider>
     </CurrentUserContext.Provider>

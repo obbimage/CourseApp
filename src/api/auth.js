@@ -48,6 +48,16 @@ export async function loginAdmin(username, password) {
     })
 
 }
+
+export async function loginUser(username, password){
+    return handleApiRequest(async ()=>{
+        return await instance.post(`${URL_LOGIN}/user`, {
+            username: username,
+            password: password
+        });
+    });
+}
+
 export async function registerEducator(username, password) {
     return register(username, password, ROLE_EDUCATOR)
 };
@@ -63,6 +73,15 @@ export async function registerAdmin(username, password) {
     })
 }
 
+export async function registerUser(username, password) {
+    const user = {
+        username: username,
+        password: password
+    }
+    return handleApiRequest(async () => {
+        return await instance.post(`${URL_REGISTER}/user`, user);
+    });
+}
 export async function getUser() {
     try {
         return (await instance.get('/user')).data.data
