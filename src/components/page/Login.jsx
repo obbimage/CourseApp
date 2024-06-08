@@ -45,11 +45,13 @@ export default function Login({ onLoginSuccess }) {
             isValidate = false;
         };
         if (isValidate) {
+
             loginEducator(userName, password)
                 .then((response) => {
                     handleApiResponse(response,
                         (data) => {
                             setToken(data.token);
+                            console.log(data)
                             setCurrentUser(data.user)
                             if (onLoginSuccess) {
                                 onLoginSuccess();
@@ -119,7 +121,7 @@ export default function Login({ onLoginSuccess }) {
                     <Link underline="hover">Quên mật khẩu</Link>
                     <Button onClick={handleLogin} variant="contained" color="success">Đăng nhập</Button>
                     <TextLine />
-                    <Button href="./signup" >Tạo tài khoản mới</Button>
+                    <Button href="/signup/educator" >Tạo tài khoản mới</Button>
                 </Stack>
             </Paper>
         </Box>

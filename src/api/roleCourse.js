@@ -21,3 +21,8 @@ export async function insertCourseRole(role) {
     })
 }
 
+export async function toggleAllowRole(roleId){
+    return handleApiRequest(async ()=>{
+        return await instance.post(`${URL_ROLE}/${roleId}/toggle`);
+    });
+}

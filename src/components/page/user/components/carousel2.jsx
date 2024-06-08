@@ -132,12 +132,12 @@ export default function SlickBanner() {
 
   return (
     <Slider {...settings} className="slider-custom">
-      <div>
+      {/* <div>
         <img src={banner_1} alt="banner 1" className="h-270" />
-      </div>
-      <div>
+      </div> */}
+      {/* <div>
         <img src={banner_2} alt="banner 2" className="h-270" />
-      </div>
+      </div> */}
       <div>
         <img src={banner_3} alt="banner 3" className="h-270" />
       </div>
@@ -147,12 +147,12 @@ export default function SlickBanner() {
       <div>
         <img src={banner_5} alt="banner 5" className="h-270" />
       </div>
-      <div>
+      {/* <div>
         <img src={banner_6} alt="banner 6" className="h-270" />
       </div>
       <div>
         <img src={banner_7} alt="banner 7" className="h-270" />
-      </div>
+      </div> */}
     </Slider>
   );
 }

@@ -1,3 +1,7 @@
+import CircleIcon from "@mui/icons-material/Circle";
+import NearMeIcon from "@mui/icons-material/NearMe";
+import StarIcon from "@mui/icons-material/Star";
+import { TabContext, TabList, TabPanel } from "@mui/lab";
 import {
   Avatar,
   Box,
@@ -5,23 +9,26 @@ import {
   Divider,
   Grid,
   Rating,
-  Tabs,
   Typography,
+  ratingClasses
 } from "@mui/material";
-import { styled, alpha } from "@mui/material/styles";
-import { Player } from "video-react";
-import courseVip1 from "../assets/images/coursevip1.png";
-import CourseInfo from "./courseInfo";
-import { useState } from "react";
-import Tab from "@mui/material/Tab";
-import { TabContext, TabList, TabPanel } from "@mui/lab";
-import convertStringHtml from "./convertStringToHtml";
-import ImageUser from "../assets/images/662a66043215d.jpg";
 import InputBase from "@mui/material/InputBase";
+import Tab from "@mui/material/Tab";
+import { alpha, styled } from "@mui/material/styles";
+import { useContext, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { CurrentUserContext } from "../../../../App";
+import { getCourseFromBuy } from "../../../../api/course";
+import { handleApiResponse } from "../../../../api/instance";
+import { getRatesByCourseId, insertRate } from "../../../../api/rate";
+import { getUnitsByCourseId } from "../../../../api/unit";
+import { isObjEmpty } from "../../../../util/object";
+import Video from "../../../video/Video";
+import ImageUser from "../assets/images/662a66043215d.jpg";
+import courseVip1 from "../assets/images/coursevip1.png";
 import Comment from "./comment";
-import StarIcon from "@mui/icons-material/Star";
-import CircleIcon from "@mui/icons-material/Circle";
-import NearMeIcon from "@mui/icons-material/NearMe";
+import convertStringHtml from "./convertStringToHtml";
+import CourseInfo from "./courseInfo";
 
 const Search = styled("div")(({ theme, isFocused }) => ({
   position: "relative",
@@ -67,6 +74,68 @@ function CourseLearn() {
   const [isValue, setIsValue] = useState(false);
   const [searchValue, setSearchValue] = useState("");
 
+  const [courseId, setCourseId] = useState(null);
+  const [course, setCourse] = useState({});
+  const [units, setUnits] = useState([]);
+  const [rates, setRate] = useState([]); // danh sach đánh giá
+
+  const [rateNew, setRateNew] = useState({ rate: 5 });
+
+  const params = useParams();
+  const navigate = useNavigate();
+
+  const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
+
+  useEffect(() => {
+    let idCourse = params.courseId;
+    if (idCourse) {
+      setCourseId(idCourse);
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!isObjEmpty(currentUser)) {
+      // lấy thông tin khóa học
+      getCourseFromBuy(courseId)
+        .then(response => {
+          handleApiResponse(response,
+            // success
+            (courseResponse) => {
+              setCourse(courseResponse)
+              console.log('course: ', courseResponse);
+            }
+          )
+        });
+
+      // lấy nội dùng khóa học
+      getUnitsByCourseId(courseId)
+        .then(response => {
+          handleApiResponse(response,
+            // success
+            (unitsResponse) => {
+              setUnits(unitsResponse);
+            }
+          )
+        });
+
+      // lấy danh sách đánh giá
+      getRatesByCourseId(courseId)
+        .then(response => {
+          handleApiResponse(response,
+            // success
+            (rateResponse) => {
+              setRate(rateResponse);
+              console.log('rate response: ', rateResponse);
+            }
+          )
+        })
+    }
+  }, [courseId]);
+
+  useEffect(() => {
+    console.log(urlVideo)
+  }, [urlVideo])
+
   const handleChangeTab = (event, newValue) => {
     setValue(newValue);
   };
@@ -83,12 +152,46 @@ function CourseLearn() {
     if (event.key === "Enter") {
       //navigate(`/search?course-name=${searchValue}`);
     }
+
   };
 
-  const handleSearch = (e) => {
+  const handleComment = (e) => {
     setSearchValue(e.target.value);
     e.target.value ? setIsValue(true) : setIsValue(false);
+    let value = e.target.value;
+    setRateNew({
+      ...rateNew,
+      comment: value
+    });
+    // setRate([
+    //   ...rates,setRateNew
+    // ])
   };
+
+  const handleUrlVideo = (url) => {
+    console.log(url)
+    setUrlVideo(url);
+  }
+
+  const handleAddRate = () => {
+
+    console.log('rate new: ', rateNew)
+
+    insertRate(courseId, rateNew)
+      .then(response => {
+        handleApiResponse(response,
+          // success
+          (responseData) => {
+            console.log('inser rate success:', responseData);
+            setRate([
+              responseData,
+              ...rates,
+            ])
+          }
+        )
+      })
+  };
+
 
   return (
     <Box sx={{ position: "relative", width: "100%" }}>
@@ -124,9 +227,10 @@ function CourseLearn() {
               Nội dung khóa học
             </Typography>
             <CourseInfo
+              value={units}
               videoActive={videoActive}
               setVideoActive={setVideoActive}
-              setUrlVideo={setUrlVideo}
+              setUrlVideo={handleUrlVideo}
               setImageVideo={setImageVideo}
               isBuy={true}
             />
@@ -145,9 +249,7 @@ function CourseLearn() {
           >
             <Box sx={{ height: { xs: "100%", sm: "400px" }, width: "710px" }}>
               {urlVideo && (
-                <Player poster={imageVideo} className="video-custom">
-                  <source src={urlVideo} />
-                </Player>
+                <Video source={urlVideo} poster={imageVideo} className="video-custom" />
               )}
             </Box>
           </Box>
@@ -194,7 +296,13 @@ function CourseLearn() {
                   padding: "0px",
                 }}
               >
-                <CourseInfo />
+                <CourseInfo
+                  value={units}
+                  videoActive={videoActive}
+                  setVideoActive={setVideoActive}
+                  setUrlVideo={handleUrlVideo}
+                  setImageVideo={setImageVideo}
+                  isBuy={true} />
               </TabPanel>
               <TabPanel
                 value="2"
@@ -219,7 +327,7 @@ function CourseLearn() {
                       mb: "14px",
                     }}
                   >
-                    Giới thiệu về khóa học
+                    {course?.name}
                   </Typography>
                   <Box
                     sx={{
@@ -233,9 +341,7 @@ function CourseLearn() {
                         textAlign: "justify",
                       }}
                     >
-                      HTML5 for web development essential HTML from scratch.
-                      With this HTML course, you don't need previous knowledge
-                      of HTML
+                      {course?.summary}
                     </Typography>
                   </Box>
                 </Box>
@@ -246,89 +352,7 @@ function CourseLearn() {
                   </Grid>
                   <Grid item xs={12} md={9}>
                     <Box>
-                      {convertStringHtml("")}
-                      <Typography
-                        sx={{
-                          fontWeight: "700",
-                          mb: "8px",
-                          textAlign: "justify",
-                        }}
-                      >
-                        Chào mừng đến với khoá học AWS Cloud for beginner -
-                        Tiếng Việt!
-                      </Typography>
-                      <Typography
-                        sx={{ fontSize: "14px", fontWeight: "700", mb: "8px" }}
-                      >
-                        ----Giới thiệu về giảng viên----
-                      </Typography>
-                      <Typography
-                        sx={{
-                          fontSize: "14px",
-                          mb: "8px",
-                          textAlign: "justify",
-                        }}
-                      >
-                        Hiện đang là AWS Cloud Solution Architect, Engineering
-                        Consultant chuyên phụ trách các KH thị trường Nhật.
-                        <br /> Làm việc với Cloud & AWS từ năm 2015 với vai trò
-                        Cloud Engineer và từ 2018 với vai trò Cloud Solution
-                        Architect.
-                        <br /> Có kinh nghiệm thực chiến trong việc tư vấn,
-                        thiết kế và triển khai các hệ thống lớn quy mô hàng
-                        triệu user trên toàn thế giới. Chịu trách nhiệm cao nhất
-                        về kiến trúc cũng như giải pháp cho các dự án, đảm bảo
-                        hệ thống được thiết kế, xây dựng và release tới khách
-                        hàng và end-user với chất lượng cao nhất.
-                      </Typography>
-                      <Typography
-                        sx={{ fontSize: "14px", textAlign: "justify" }}
-                      >
-                        Chứng chỉ AWS hiện có:
-                      </Typography>
-                      <ul>
-                        <li>
-                          <Typography sx={{ fontSize: "14px" }}>
-                            AWS Solution Architect Professional (2020, 2023)
-                          </Typography>
-                        </li>
-                        <li>
-                          <Typography sx={{ fontSize: "14px" }}>
-                            AWS Solution Architect Associate (2018)
-                          </Typography>
-                        </li>
-                        <li>
-                          <Typography sx={{ fontSize: "14px" }}>
-                            AWS Developer Associate (2015)
-                          </Typography>
-                        </li>
-                      </ul>
-                      <Typography
-                        sx={{ fontSize: "14px", fontWeight: "700", mb: "8px" }}
-                      >
-                        ----Về khoá học AWS Cloud for beginner---
-                      </Typography>
-                      <Typography
-                        sx={{
-                          fontSize: "14px",
-                          mb: "8px",
-                          textAlign: "justify",
-                        }}
-                      >
-                        Bạn đang là IT, Software Engineer hoặc sinh viên đang
-                        muốn bắt đầu hành trình trên Cloud của mình, hoặc bạn
-                        muốn học thêm những kiến thức liên quan AWS nói riêng
-                        phục vụ cho công việc hằng ngày cũng như tìm kiếm cơ hội
-                        mới. Khoá học này đích thực dành cho bạn! Khoá học này
-                        tập trung vào những kiến thưc cơ bản liên quan tới Cloud
-                        Computing và AWS, lịch sử hình thành và phát triển của
-                        AWS, các dịch vụ cơ bản trên AWS, đặc trưng và tình
-                        huống vận dụng của cá dịch vụ. Khoá học thiết kế đan xen
-                        giữa lý thuyết và thực hành, giúp các bạn không chỉ nắm
-                        rõ các dịch vụ của AWS mà còn tự tin thao tác với chúng,
-                        có thể vận dụng trong dự án thực tế cũng như phát triển
-                        sản phẩm của riêng bạn.
-                      </Typography>
+                      {convertStringHtml(course?.description || "")}
                     </Box>
                   </Grid>
                 </Grid>
@@ -354,7 +378,7 @@ function CourseLearn() {
                       >
                         <Avatar
                           alt="Nguyen Sinh Tien"
-                          src={ImageUser}
+                          src={course?.user?.avatar || ImageUser}
                           sx={{ width: 64, height: 64 }}
                         />
                         <Box>
@@ -366,14 +390,14 @@ function CourseLearn() {
                               fontSize: "18px",
                             }}
                           >
-                            Linh Nguyen
+                            {`${course?.user?.lastName} ${course?.user?.firstName}`}
                           </Typography>
                           <Typography
                             sx={{
                               color: "#6a6f7a",
                             }}
                           >
-                            Engineering Consultant, AWS Cloud Solution Architect
+                            {`${course?.user?.educator?.biography} `}
                           </Typography>
                         </Box>
                       </Box>
@@ -385,19 +409,7 @@ function CourseLearn() {
                           textAlign: "justify",
                         }}
                       >
-                        I have been working with Cloud (main AWS) since 2015 and
-                        5 year working and living in Japan.
-                        <br /> Language: Japanese (Business Intermediate level),
-                        English (Intermediate).
-                        <br /> Certificates: AWS Certified Solution Architect
-                        Professional (since 2018, re-new 2023).
-                        <br /> Other: AWS Community Builder (since 2023).
-                        <br /> As a Cloud Solution Architect (SA), I can provide
-                        solutions for customer during system design, development
-                        and deployment.
-                        <br /> I also contribute to community by many activities
-                        like Youtube channel, on-demand private training course
-                        and now on Udemy. Nice to make friend with all of you.
+                        {`${course?.user?.educator?.description} `}
                       </Typography>
                     </Box>
                   </Grid>
@@ -438,7 +450,7 @@ function CourseLearn() {
                     <StyledInputBase
                       onFocus={handleFocus}
                       onBlur={handleBlur}
-                      onChange={handleSearch}
+                      onChange={handleComment}
                       onKeyPress={handleKeyPress}
                       value={searchValue}
                       placeholder="Nhập bình luận ví dụ: khóa học rất hay..."
@@ -446,6 +458,7 @@ function CourseLearn() {
                     />
                     {isValue && (
                       <Button
+                        onClick={handleAddRate}
                         sx={{
                           backgroundColor: "#2d2f31",
                           p: "6px",
@@ -482,15 +495,25 @@ function CourseLearn() {
                       value={valueRating}
                       onChange={(event, newValue) => {
                         setValueRating(newValue);
+                        setRateNew({
+                          ...rateNew,
+                          rate: newValue
+                        })
                       }}
                     />
                   </Box>
 
                   <Box sx={{ mt: "24px" }}>
                     <Grid container spacing={2}>
-                      <Grid item xs={12} sx={{ minWidth: "320px" }}>
-                        <Comment ImageUser={ImageUser} />
-                      </Grid>
+                      {
+                        rates.map(rateItem => {
+                          return (
+                            <Grid item xs={12} sx={{ minWidth: "320px" }}>
+                              <Comment rate={rateItem} ImageUser={ImageUser} />
+                            </Grid>
+                          )
+                        })
+                      }
                       <Grid item xs={12} sx={{ minWidth: "320px" }}>
                         <Comment ImageUser={ImageUser} />
                       </Grid>

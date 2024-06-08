@@ -12,9 +12,63 @@ import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import AppShortcutIcon from "@mui/icons-material/AppShortcut";
 import AllInclusiveIcon from "@mui/icons-material/AllInclusive";
 import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useContext, useEffect, useState } from "react";
+import { insertBuy } from "../../../../api/buy";
+import { handleApiResponse } from "../../../../api/instance";
+import { AlertFeddback } from "../../../feedback/AlertFeedback";
+import { CurrentUserContext } from "../../../../App";
+import { isObjEmpty } from "../../../../util/object";
 
-function CourseItemLaptop({ isScrolled }) {
+
+function CourseItemLaptop({ isScrolled, value, isBuy }) {
+  const [course, setCourse] = useState(value);
+
+  const [alert, setAlert] = useState("");
+  const [openAlert, setOpenAlert] = useState(false);
+  const [severityAlert, setSeverityAlert] = useState('success');
+  const [isBuyState, setIsBuyState] = useState(false)
+  const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    setCourse(value);
+  }, [value]);
+
+  useEffect(() => {
+    setIsBuyState(isBuy);
+    console.log('isBuy: ', isBuy);
+  }, [isBuy]);
+
+  useEffect(()=>{
+    console.log('is buyState: ', isBuyState);
+  },[isBuyState]);
+
+  const handleBuyCourse = () => {
+    let courseId = course.id;
+    // kiểm tra đã đăng nhập hay chưa
+    if (!isObjEmpty(currentUser)) {
+      let useId = currentUser.id;
+      insertBuy(useId, courseId)
+        .then(response => {
+          handleApiResponse(response,
+            // success
+            (buyResponse) => {
+              navigate('/storage');
+            },
+            // falied
+            (err) => {
+              setAlert("Thanh toán thất bại");
+              setSeverityAlert("error");
+              setOpenAlert(true);
+            }
+          )
+        })
+    } else {
+      navigate('/login');
+    }
+  }
   return (
     <Box sx={{ position: "relative", display: { xs: "none", sm: "block" } }}>
       <Box
@@ -30,6 +84,11 @@ function CourseItemLaptop({ isScrolled }) {
           p: "8px 16px",
         }}
       >
+        <AlertFeddback
+          open={openAlert}
+          severity={severityAlert}
+          alert={alert}
+        />
         <Grid container spacing={0}>
           <Grid item xs={12} md={8}>
             <Typography
@@ -41,6 +100,7 @@ function CourseItemLaptop({ isScrolled }) {
                 mb: "6px",
               }}
             >
+              {/* {course.name}  dfdfsdf */}
               AWS Certified Solutions Architect - Associate (Tiếng Việt)
             </Typography>
             <Box
@@ -121,8 +181,9 @@ function CourseItemLaptop({ isScrolled }) {
                 boxShadow: 2,
               }}
             >
-              <Player poster={courseVip1}>
-                <source src="https://media.w3.org/2010/05/sintel/trailer_hd.mp4" />
+              <Player poster={course?.img || `${process.env.PUBLIC_URL}/imgs/logoCourse.png`}>
+                {/* <source src="https://media.w3.org/2010/05/sintel/trailer_hd.mp4" /> */}
+                <source src={course.clipDemo} />
               </Player>
               <Box sx={{ p: "24px" }}>
                 <Typography
@@ -144,27 +205,47 @@ function CourseItemLaptop({ isScrolled }) {
                       mt: "6px",
                     }}
                   >
-                    ₫
+                    {/* ₫ */}
                   </Typography>{" "}
-                  299.000
+                  { isBuy || course.price}
                 </Typography>
-                <Button
-                  component={Link}
-                  to="/course/1/learn"
-                  variant="contained"
-                  sx={{
-                    backgroundColor: "#a435f0",
-                    color: "white",
-                    width: "100%",
-                    "&:hover": {
+
+                {isBuyState ? (
+                  <Button
+                    component={Link}
+                    to={`/course/${course.id}/learn`}
+                    variant="contained"
+                    sx={{
                       backgroundColor: "#a435f0",
-                      opacity: 0.9,
-                    },
-                    mb: "16px",
-                  }}
-                >
-                  Đăng ký khóa học
-                </Button>
+                      color: "white",
+                      width: "100%",
+                      "&:hover": {
+                        backgroundColor: "#a435f0",
+                        opacity: 0.9,
+                      },
+                      mb: "16px",
+                    }}
+                  >
+                    Khóa học đã đăng ký
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleBuyCourse}
+                    variant="contained"
+                    sx={{
+                      backgroundColor: "#a435f0",
+                      color: "white",
+                      width: "100%",
+                      "&:hover": {
+                        backgroundColor: "#a435f0",
+                        opacity: 0.9,
+                      },
+                      mb: "16px",
+                    }}
+                  >
+                    Đăng ký khóa học
+                  </Button>
+                )}
                 <Typography
                   sx={{ fontSize: "12px", textAlign: "center", mb: "18px" }}
                 >
@@ -262,13 +343,12 @@ function CourseItemLaptop({ isScrolled }) {
                     mb: "16px",
                   }}
                 >
-                  AWS Certified Solutions Architect - Associate (Tiếng Việt)
+                  {course.name}
                 </Typography>
                 <Typography
                   sx={{ color: "#fff", fontSize: "20px", mb: "24px" }}
                 >
-                  Khóa học luyện thi chứng chỉ AWS Certified Solutions Architect
-                  Associate SAA-C03 (Tiếng Việt)
+                  {course?.summary}
                 </Typography>
                 <Box
                   sx={{
@@ -358,7 +438,7 @@ function CourseItemLaptop({ isScrolled }) {
                       fontSize: "14px",
                     }}
                   >
-                    Luu Ho Phuong
+                    {`${course?.user?.lastName} ${course?.user?.firstName}`}
                   </Typography>
                 </Box>
               </Box>

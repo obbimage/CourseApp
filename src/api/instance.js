@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getStorageTokenUser } from "../util/localStorage";
 
 const BASE_URL = "http://localhost:8080";
 
@@ -12,8 +13,8 @@ export const instance = axios.create({
 instance.interceptors.request.use(
     config => {
         // Lấy token từ local storage hoặc bất kỳ nơi nào bạn lưu trữ nó
-        const token = localStorage.getItem("token");
-
+        // const token = localStorage.getItem("token");
+        const token = getStorageTokenUser();
         // Nếu tồn tại token, thêm vào header Authorization
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;

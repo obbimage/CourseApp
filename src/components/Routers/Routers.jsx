@@ -27,6 +27,7 @@ import Data from "../page/admin/Data";
 import MangerCourse from "../page/admin/MangerCourse";
 import DetailsCourse from "../page/admin/layout/DetailsCourse";
 import Char from "../page/admin/Char";
+import { StringLink } from "../../static/StringLink";
 
 export default function Routers() {
   const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
@@ -37,10 +38,10 @@ export default function Routers() {
 
   useEffect(() => {
     // nêu không đăng nhập và truy cập các trang trước đó
-    if (!token && location.pathname !== '/login' && location.pathname !== '/signup' && location.pathname !== '/login/admin') {
-      setPreLocation(location.pathname) // luu tru trang truoc do
-      navigate('/login');
-    }
+    // if (!token && location.pathname !== '/login/educator' && location.pathname !== '/signup' && location.pathname !== '/login/admin') {
+    //   setPreLocation(location.pathname) // luu tru trang truoc do
+    //   navigate(StringLink.loginEducator);
+    // }
   }, [token, navigate, location]);
 
   const handleLoginSuccess = () => {
@@ -49,14 +50,14 @@ export default function Routers() {
       console.log(preLocation);
       navigate(preLocation);
     } else {
-      navigate("/");
+      navigate("/educator");
     }
   }
 
   return (
     <Routes>
-      <Route path='/signup' element={<Signup />} />
-      <Route path='/login' element={<Login onLoginSuccess={handleLoginSuccess} />} />
+      <Route path='/signup/educator' element={<Signup />} />
+      <Route path='/login/educator' element={<Login onLoginSuccess={handleLoginSuccess} />} />
       <Route path='/changepassword' element={<ChangePassword />} />
       <Route path="/educator/course/create" element={<CreateCourse />} />
       <Route path="/educator/course/edit" element={<EditCourse />}>
@@ -80,7 +81,7 @@ export default function Routers() {
       <Route path="admin" element={<AdminPage />}>
         <Route path="data" element={<Data />} />
         <Route path="course" element={<MangerCourse />} />
-        <Route path="course/review" element={<DetailsCourse />} />
+        <Route path="course/:courseId/review" element={<DetailsCourse />} />
         <Route path="profile" element={<AdminProfile />} />
         <Route path="char" element={<Char />} />
       </Route>

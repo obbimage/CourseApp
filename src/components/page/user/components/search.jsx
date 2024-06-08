@@ -1,10 +1,12 @@
-import { Box, Button, IconButton, Input, Typography } from "@mui/material";
-import { Link, useLocation } from "react-router-dom";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
-import { useEffect, useState } from "react";
-import CourseList from "./courseList";
-import CircularProgress from "@mui/material/CircularProgress";
 import NearMeIcon from "@mui/icons-material/NearMe";
+import { Box, Button, IconButton, Input, Typography } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
+import { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
+import { findAllCourseByName } from "../../../../api/course";
+import { handleApiRequest, handleApiResponse } from "../../../../api/instance";
+import CourseList from "./courseList";
 const ariaLabel = { "aria-label": "description" };
 
 function Search() {
@@ -13,7 +15,11 @@ function Search() {
   const [isLoading, setIsLoading] = useState(false);
   const [isValue, setIsValue] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+  const [courses, setCourses] = useState([]);
   const location = useLocation();
+
+  const [pageNumber, setPageNumber] = useState(0);
+  const pageSize = 5;
 
   const handleSearch = (e) => {
     setSearchValue(e.target.value);
@@ -29,6 +35,21 @@ function Search() {
       ? setIsSearch(false)
       : setIsSearch(true);
   }, [courseName, location.search]);
+
+  useEffect(() => {
+    if (courseName) {
+      findAllCourseByName(courseName, pageNumber, pageSize)
+        .then(response => {
+          handleApiResponse(response,
+            (dataResponse) => {
+              let coursesResponse = dataResponse.content;
+              setCourses(coursesResponse);
+            }
+          )
+        });
+    }
+
+  }, [courseName]);
   return (
     <Box sx={{ mt: "20px", minHeight: { xs: "770px", sm: "620px" } }}>
       <Box
@@ -110,8 +131,9 @@ function Search() {
           <CourseList
             isNew={false}
             title={"Khóa học"}
-            isPrice={false}
+            isPrice={true}
             isStuded={true}
+            value={courses}
           />
         ))}
     </Box>

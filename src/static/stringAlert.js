@@ -2,7 +2,7 @@ import { Password } from "@mui/icons-material";
 import { changePassword } from "../api/auth";
 
 export const stringAlert = {
-    require:"Bắt buộc",
+    require:"Không được để trống",
     confirmPassword:"Mật khẩu không trùng nhau",
     lengthPassWord:"Độ dài Mật khẩu tối thiểu 8, tối đa 16",
     PasswordNotCorrect: "mật khẩu không chính xác",

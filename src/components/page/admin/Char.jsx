@@ -1,7 +1,22 @@
 import { Box, Paper, Typography, useTheme } from "@mui/material";
 import LayoutAdmin, { LayoutContentAdmin, LayoutHeaderAdmin } from "./layout/LayoutAdmin";
+import { useEffect, useState } from "react";
+import { getAllEducator } from "../../../api/educator";
+import { handleApiResponse } from "../../../api/instance";
 
 function Char() {
+    const [countEducator,setCountEducator] = useState(0);
+    useEffect(()=>{
+        getAllEducator()
+        .then(response=>{
+            handleApiResponse(response,
+                // success
+                (educatorResponse)=>{
+                    setCountEducator(educatorResponse.length);
+                }
+            )
+        })
+    },[])
     const theme = useTheme();
     return (
         <LayoutAdmin>
@@ -23,8 +38,8 @@ function Char() {
                     </Box>
                     <Box>
                         <Typography>Tổng giảng viên</Typography>
-                        <Typography fontSize={'20px'}>0 Đăng ký</Typography>
-                        <Typography>0 đăng ký tháng này</Typography>
+                        <Typography fontSize={'20px'}>{countEducator} Đăng ký</Typography>
+                        <Typography>{countEducator} đăng ký tháng này</Typography>
                     </Box>
                 </Paper>
             </LayoutContentAdmin>

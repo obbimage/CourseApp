@@ -1,7 +1,14 @@
 import { Box, Container, Grid, Typography } from "@mui/material";
 import Course from "./course";
+import { useEffect, useState } from "react";
 
-function CourseList({ isNew, title, isPrice, isStuded }) {
+function CourseList({ isNew, title, isPrice, isStuded, value }) {
+  const [courses, setCourses] = useState([]);
+  useEffect(() => {
+    if (Array.isArray(value)) {
+      setCourses(value);
+    }
+  }, [value]);
   return (
     <Container maxWidth="xl">
       <Box sx={{ display: "flex", mb: "24px", mt: "12px" }}>
@@ -32,7 +39,19 @@ function CourseList({ isNew, title, isPrice, isStuded }) {
         )}
       </Box>
       <Grid container spacing={2}>
-        <Grid item xs={12} sm={6} lg={3} sx={{ minWidth: "320px" }}>
+        {
+          courses.map((course, index) => {
+            return (
+              <Grid key={course.id} item xs={12} sm={6} lg={3} sx={{ minWidth: "320px" }}>
+                <Course isPrice={isPrice} isStuded={isStuded} value={course} />
+              </Grid>
+            );
+          })
+        }
+        {/* <Grid item xs={12} sm={6} lg={3} sx={{ minWidth: "320px" }}>
+          <Course isPrice={isPrice} isStuded={isStuded} value={course} />
+        </Grid> */}
+        {/* <Grid item xs={12} sm={6} lg={3} sx={{ minWidth: "320px" }}>
           <Course isPrice={isPrice} isStuded={isStuded} />
         </Grid>
         <Grid item xs={12} sm={6} lg={3} sx={{ minWidth: "320px" }}>
@@ -43,7 +62,7 @@ function CourseList({ isNew, title, isPrice, isStuded }) {
         </Grid>
         <Grid item xs={12} sm={6} lg={3} sx={{ minWidth: "320px" }}>
           <Course isPrice={isPrice} isStuded={isStuded} />
-        </Grid>
+        </Grid> */}
       </Grid>
     </Container>
   );

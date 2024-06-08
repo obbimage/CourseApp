@@ -4,15 +4,23 @@ import { Link } from "react-router-dom";
 import GroupIcon from "@mui/icons-material/Group";
 import courseVip1 from "../assets/images/coursevip1.png";
 import iconVip from "../assets/images/vip.svg";
-import { useState } from "react";
-
-function Course({ isPrice, isStuded }) {
+import { useEffect, useState } from "react";
+import QueryBuilderIcon from '@mui/icons-material/QueryBuilder';
+function Course({ isPrice, isStuded, value }) {
   const [isHovered, setIsHovered] = useState(false);
+
+  const [course, setCourse] = useState({});
+
+  useEffect(() => {
+    if (value) {
+      setCourse(value);
+    }
+  }, [value]);
 
   return (
     <Box
       component={Link}
-      to="/course/1"
+      to={`/course/id?course_id=${course.id}`}
       sx={{ display: "block", textDecoration: "none", mb: "20px" }}
     >
       <Box
@@ -44,7 +52,8 @@ function Course({ isPrice, isStuded }) {
           />
         </Box>
         <ImageCustom
-          src={courseVip1}
+          // src={courseVip1}
+          src={course?.img}
           alt="courseVip1"
           sx={{
             display: "block",
@@ -102,18 +111,25 @@ function Course({ isPrice, isStuded }) {
         sx={{
           color: "#292929",
           fontSize: "16px",
-          lineHeight: "14px",
+          lineHeight: "16px",
           fontWeight: "500",
           mt: "14px",
         }}
       >
-        HTML CSS Pro
+        {course?.name}
       </Typography>
+      <Box sx={{  height: '20px' ,display:'flex', alignItems:'center'}}>
+        <QueryBuilderIcon sx={{height:'90%'}} />
+        <Typography sx={{ fontSize: '13px', fontWeight: '1px' }}>
+          {course?.dateUpload}
+        </Typography>
+      </Box>
       {isPrice && (
         <Box
-          sx={{ display: "flex", alignItems: "end", gap: "12px", mt: "16px" }}
+          sx={{ display: "flex", alignItems: "end", gap: "12px", mt: "12px" }}
         >
-          <Typography
+          {/* giá gốc */}
+          {/* <Typography
             sx={{
               fontSize: "14px",
               color: "#000",
@@ -121,7 +137,8 @@ function Course({ isPrice, isStuded }) {
             }}
           >
             2.500.000đ
-          </Typography>
+          </Typography> */}
+          {/* Giá giảm */}
           <Typography
             sx={{
               fontSize: "16px",
@@ -129,7 +146,7 @@ function Course({ isPrice, isStuded }) {
               fontWeight: "500",
             }}
           >
-            1.299.000đ
+            {course.price}
           </Typography>
         </Box>
       )}

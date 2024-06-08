@@ -49,8 +49,8 @@ export async function loginAdmin(username, password) {
 
 }
 
-export async function loginUser(username, password){
-    return handleApiRequest(async ()=>{
+export async function loginUser(username, password) {
+    return handleApiRequest(async () => {
         return await instance.post(`${URL_LOGIN}/user`, {
             username: username,
             password: password
@@ -120,7 +120,9 @@ export async function changePassword(idUser, oldPassword, newPassword) {
 }
 
 export async function updateUser(id, user) {
-
+    // return handleApiRequest(async () => {
+    //     return await instance.put(`/user/updateInfo/${id}`, user);
+    // });
     try {
         const response = await instance.put(`/user/updateInfo/${id}`, user)
         return response;
@@ -135,22 +137,31 @@ export async function updateUser(id, user) {
 }
 
 export async function updateAvatar(id, files) {
-    try {
-        const formData = new FormData();
-        console.log(files)
-        formData.append('file', files[0], files[0].name);
+    // try {
+    //     const formData = new FormData();
+    //     console.log(files)
+    //     formData.append('file', files[0], files[0].name);
 
-        const response = await instance.post(`/user/updateAvatar/${id}`, formData, {
+    //     const response = await instance.post(`/user/updateAvatar/${id}`, formData, {
+    //         headers: {
+    //             'Content-Type': 'multipart/form-data'
+    //         }
+    //     })
+    //     return response;
+    // } catch (err) {
+    //     console.log(err)
+    //     if (err.response) {
+    //         return { status: err.response.status }
+    //     }
+    //     return null;
+    // }
+    const formData = new FormData();
+    formData.append('file', files[0], files[0].name);
+    return handleApiRequest(async () => {
+        return await await instance.post(`/user/updateAvatar/${id}`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
         })
-        return response;
-    } catch (err) {
-        console.log(err)
-        if (err.response) {
-            return { status: err.response.status }
-        }
-        return null;
-    }
+    });
 }

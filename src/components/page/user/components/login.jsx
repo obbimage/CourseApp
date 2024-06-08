@@ -1,14 +1,15 @@
-import { Box, Button, InputBase, Typography, styled } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import ImageCustom from "./imageCustom";
-import logoImage from "../assets/images/f8-icon.18cd71cfcfa33566a22b.png";
+import { Box, Button, InputBase, Typography, styled } from "@mui/material";
+import Alert from "@mui/material/Alert";
+import Snackbar from "@mui/material/Snackbar";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Snackbar from "@mui/material/Snackbar";
-import Alert from "@mui/material/Alert";
 import { loginUser } from "../../../../api/auth";
-import { Password } from "@mui/icons-material";
 import { handleApiResponse } from "../../../../api/instance";
+import { setStorageTokenUser, setStorageUser } from "../../../../util/localStorage";
+import logoImage from "../assets/images/f8-icon.18cd71cfcfa33566a22b.png";
+import ImageCustom from "./imageCustom";
+import { StringLink } from "../../../../static/StringLink";
 
 //bi loi thi focus mau do #f33a58
 const InputCustom = styled("div")(({ isFocused, isError }) => ({
@@ -60,9 +61,12 @@ function Login({ isLogin, setIsLogin, setCurrentUser }) {
       .then(response => {
         handleApiResponse(response,
           (dataResponse) => {
-            if (setCurrentUser){
+            if (setCurrentUser) {
               let user = dataResponse.user;
               setCurrentUser(user);
+              setStorageUser(user);
+              let token = dataResponse.token
+              setStorageTokenUser(token)
             }
             setIsLogin(true); // thay doi giao dien khi nguoi dung dan dang nhap thanh cong
             setLoginResult(true); // hien thi alert
@@ -307,9 +311,9 @@ function Login({ isLogin, setIsLogin, setCurrentUser }) {
             sx={{
               display: "flex",
               flexDirection: "column",
-              gap: "40px",
+              gap: "2px",
               alignItems: "center",
-              mt: "40px",
+              mt: "15px",
             }}
           >
             <Typography sx={{ fontSize: "14px" }}>
@@ -326,6 +330,18 @@ function Login({ isLogin, setIsLogin, setCurrentUser }) {
               >
                 Đăng ký
               </Typography>
+            </Typography>
+            <Typography
+              sx={{
+                textDecoration: "none",
+                color: "#f50123",
+                fontWeight: "500",
+                fontSize: "14px",
+              }}
+              component={Link}
+              to={StringLink.loginEducator}
+            >
+              Chuyển sang trang dành cho educator
             </Typography>
             <Typography
               sx={{ fontSize: "11px", color: "#666", textAlign: "center" }}

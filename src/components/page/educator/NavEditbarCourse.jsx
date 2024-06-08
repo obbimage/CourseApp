@@ -5,6 +5,8 @@ import { Link, NavLink, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { grey } from "@mui/material/colors";
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
+import { setCompleteCourse } from "../../../api/course";
+import { handleApiResponse } from "../../../api/instance";
 const objNavLink = (name, url = '#') => {
     return ({ name, url });
 };
@@ -73,20 +75,32 @@ const ListItemCustom = ({ name }) => {
                 {/* <CircleCheck>
                     <CheckIcon sx={{ width: '80%' }} />
                 </CircleCheck> */}
-                <AddCircleOutlineOutlinedIcon/>
-                <Typography sx={{marginLeft: '3px'}}>{name}</Typography>
+                <AddCircleOutlineOutlinedIcon />
+                <Typography sx={{ marginLeft: '3px' }}>{name}</Typography>
             </ListItem>
         </>
     )
 }
 
-export default function EditNavbarCourse() {
+export default function EditNavbarCourse({ isCourseConfirm, courseId }) {
     const theme = useTheme();
     const location = useLocation();
 
     useEffect(() => {
         console.log(location.pathname)
-    }, [location])
+    }, [location]);
+
+    const handleConfirm = () => {
+        setCompleteCourse(courseId, true)
+            .then(response => {
+                handleApiResponse(response,
+                    // success
+                    (response) => {
+                        console.log(response);
+                    }
+                )
+            })
+    }
     return (
         <Box marginTop={theme.spacing(4)} marginRight={theme.spacing(4)} maxWidth={"260px"}>
             <Title>Lên kế hoạch cho khóa học của bạn</Title>
@@ -138,8 +152,11 @@ export default function EditNavbarCourse() {
             </List>
 
             <Box>
-                <Button variant="contained">
-                    Gửi xét duyệt 
+                <Button
+                    onClick={handleConfirm}
+                    disabled={isCourseConfirm}
+                    variant="contained" title="Khóa học đã xuất bản không thể chỉnh sửa">
+                    Gửi xét duyệt
                 </Button>
             </Box>
         </Box>

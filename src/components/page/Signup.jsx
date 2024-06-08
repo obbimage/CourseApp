@@ -166,7 +166,7 @@ export default function Signup() {
                 <Button onClick={handleSignUp} variant="contained" color="success">Đăng Ký</Button>
                 <Typography variant="body2" >
                     Đã có tài khoản?
-                    <Link href="./login"> Đăng nhập</Link>
+                    <Link href="/login/educator"> Đăng nhập</Link>
                 </Typography>
             </Stack>
         </Paper>

@@ -1,21 +1,24 @@
+import { Box, Grid } from "@mui/material";
 import * as React from "react";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
+import "slick-carousel/slick/slick-theme.css";
+import "slick-carousel/slick/slick.css";
+import { CurrentUserContext } from "../../../App";
+import { getStorageTokenUser, getStorageUser } from "../../../util/localStorage";
+import CourseItem from "./components/courseItem";
+import CourseLearn from "./components/courseLearn";
+import Footer from "./components/footer";
 import HeaderLaptop from "./components/headerLaptop";
 import HeaderMobile from "./components/headerMobile";
-import { Box, Grid } from "@mui/material";
 import Home from "./components/home";
-import Search from "./components/search";
 import Info from "./components/info";
-import Navbar from "./components/navbar";
-import Footer from "./components/footer";
 import Login from "./components/login";
+import Navbar from "./components/navbar";
 import Register from "./components/register";
-import CourseItem from "./components/courseItem";
+import Search from "./components/search";
 import Test from "./components/test";
-import CourseLearn from "./components/courseLearn";
 import "./index.css";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
+import StorageCourse from "./components/StorageCourse";
 
 
 function HeadFooterNav({
@@ -25,8 +28,7 @@ function HeadFooterNav({
   isInfoPage,
   positionFix,
   currentUser
-})
- {
+}) {
 
   return (
     <>
@@ -35,7 +37,7 @@ function HeadFooterNav({
         setIsLogin={setIsLogin}
         isInfoPage={isInfoPage}
         currentUser={currentUser}
-        
+
       />
       <HeaderMobile
         isLogin={isLogin}
@@ -66,7 +68,7 @@ function HeadFooterNav({
         </Grid>
       </Grid>
 
-      <Footer />
+      {/* <Footer /> */}
     </>
   );
 }
@@ -81,9 +83,10 @@ function HeadFooter({
 }) {
   return (
     <Box sx={{
-      width:'100%',
-      display:'flex',
-      flexDirection:'column'
+      width: '100%',
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column'
     }}>
       <HeaderLaptop
         isLogin={isLogin}
@@ -119,7 +122,7 @@ function HeadFooter({
         </Grid>
       </Grid>
 
-      <Footer />
+      {/* <Footer /> */}
     </Box>
   );
 }
@@ -128,10 +131,18 @@ function AppContext() {
   const [isLogin, setIsLogin] = React.useState(false);
   const [positionFix, setPositionFix] = React.useState(false);
   const [isInfoPage, setIsInfoPage] = React.useState(false);
-  const [currentUser, setCurrentUser] = React.useState(null);
+  // const [currentUser, setCurrentUser] = React.useState(null);
   const location = useLocation();
 
+  const { currentUser, setCurrentUser } = React.useContext(CurrentUserContext)
 
+  React.useEffect(() => {
+    const user = getStorageUser();
+    if (user) {
+      setCurrentUser(user);
+      setIsLogin(true);
+    }
+  }, [])
   React.useEffect(() => {
     if (location.pathname === "/info") {
       setIsInfoPage(true);
@@ -173,6 +184,20 @@ function AppContext() {
         }
       />
       <Route
+        path="/storage"
+        element={
+          <HeadFooterNav
+            isLogin={isLogin}
+            setIsLogin={setIsLogin}
+            isInfoPage={isInfoPage}
+            positionFix={positionFix}
+            currentUser={currentUser}
+          >
+            <StorageCourse />
+          </HeadFooterNav>
+        }
+      />
+      <Route
         path="/info"
         element={
           <HeadFooter
@@ -188,7 +213,7 @@ function AppContext() {
         }
       />
       <Route
-        path="/course/1"
+        path="/course/:couseId"
         element={
           <HeadFooter
             isLogin={isLogin}
@@ -231,8 +256,6 @@ function AppContext() {
 
 export default function UserApp() {
   return (
-    // <BrowserRouter>
-      <AppContext />
-    // </BrowserRouter>
+    <AppContext />
   );
 }

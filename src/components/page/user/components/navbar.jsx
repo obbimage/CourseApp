@@ -1,16 +1,23 @@
 import { Box, IconButton, Typography } from "@mui/material";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import AddIcon from "@mui/icons-material/Add";
 import HomeIcon from "@mui/icons-material/Home";
 import AssignmentIcon from "@mui/icons-material/Assignment";
 import PersonIcon from "@mui/icons-material/Person";
 import LogoutIcon from "@mui/icons-material/Logout";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { CurrentUserContext } from "../../../../App";
+import { removeStorageTokenUser, removeStorageUser } from "../../../../util/localStorage";
+import SchoolIcon from '@mui/icons-material/School';
 
 function Navbar({ isLogin, setIsLogin, positionFix }) {
   const [showNavbar, setShowNavbar] = useState(false);
   const [navActive, setNavActive] = useState("/");
+  const navigate = useNavigate();
   const location = useLocation();
+
+
+  const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
 
   const handleMouseEnter = () => {
     setShowNavbar(true);
@@ -24,6 +31,15 @@ function Navbar({ isLogin, setIsLogin, positionFix }) {
     const value = location.pathname;
     setNavActive(value);
   }, [location.pathname]);
+
+  const handleLogout = () => {
+    console.log('logout')
+    setIsLogin(false)
+    setCurrentUser({});
+    removeStorageUser();
+    removeStorageTokenUser();
+    navigate("/");
+  }
 
   return (
     <Box
@@ -83,7 +99,7 @@ function Navbar({ isLogin, setIsLogin, positionFix }) {
           }}
           color="#fff"
         >
-          <AddIcon />
+          {/* <AddIcon /> */}
         </Box>
         <IconButton
           component={Link}
@@ -105,48 +121,80 @@ function Navbar({ isLogin, setIsLogin, positionFix }) {
             Trang chủ
           </Typography>
         </IconButton>
-        <IconButton
-          component={Link}
-          to="/search"
-          color="#000"
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            borderRadius: "16px",
-            width: "72px",
-            height: "72px",
-            backgroundColor: navActive === "/search" ? "#e8ebed" : "#fff",
-          }}
-        >
-          <AssignmentIcon />
-          <Typography
-            sx={{ fontSize: "12px", fontWeigth: "700", color: "#000" }}
+        {
+          isLogin &&
+          <IconButton
+            component={Link}
+            to="/storage"
+            color="#000"
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              borderRadius: "16px",
+              width: "72px",
+              height: "72px",
+              backgroundColor: navActive === "/storage" ? "#e8ebed" : "#fff",
+            }}
           >
-            Lộ trình
-          </Typography>
-        </IconButton>
-        <IconButton
-          component={Link}
-          to="/info"
-          color="#000"
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            borderRadius: "16px",
-            width: "72px",
-            height: "72px",
-            backgroundColor: navActive === "/info" ? "#e8ebed" : "#fff",
-          }}
-        >
-          <PersonIcon />
-          <Typography
-            sx={{ fontSize: "12px", fontWeigth: "700", color: "#000" }}
-          >
-            Thông tin
-          </Typography>
-        </IconButton>
+            <AssignmentIcon />
+            <Typography
+              sx={{ fontSize: "12px", fontWeigth: "700", color: "#000" }}
+            >
+              Lộ trình
+            </Typography>
+          </IconButton>
+        }
+        {
+          isLogin && (
+            <IconButton
+              component={Link}
+              to="/search"
+              color="#000"
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                borderRadius: "16px",
+                width: "72px",
+                height: "72px",
+                backgroundColor: navActive === "/search" ? "#e8ebed" : "#fff",
+              }}
+            >
+              <SchoolIcon />
+              <Typography
+                sx={{ fontSize: "12px", fontWeigth: "700", color: "#000" }}
+              >
+                Khóa học
+              </Typography>
+            </IconButton>
+          )
+        }
+        {
+          isLogin && (
+            <IconButton
+              component={Link}
+              to="/info"
+              color="#000"
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                borderRadius: "16px",
+                width: "72px",
+                height: "72px",
+                backgroundColor: navActive === "/info" ? "#e8ebed" : "#fff",
+              }}
+            >
+              <PersonIcon />
+              <Typography
+                sx={{ fontSize: "12px", fontWeigth: "700", color: "#000" }}
+              >
+                Thông tin
+              </Typography>
+            </IconButton>
+          )
+        }
         {isLogin && (
           <IconButton
+            onClick={handleLogout}
             color="#000"
             sx={{
               display: "flex",

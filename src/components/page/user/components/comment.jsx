@@ -1,6 +1,21 @@
 import { Avatar, Box, Rating, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
 
-function Comment({ ImageUser }) {
+function Comment({ ImageUser, rate }) {
+  const [rateState, setRateState] = useState({});
+  const [userState, setUserState] = useState({});
+
+  useEffect(() => {
+    if (rate) {
+      setRateState(rate);
+    }
+
+  }, [rate]);
+
+  useEffect(() => {
+    let user = rateState.user;
+    setUserState(user);
+  }, [rateState])
   return (
     <Box sx={{ p: "24px 0", borderTop: "1px solid #d1d7dc" }}>
       <Box
@@ -13,7 +28,7 @@ function Comment({ ImageUser }) {
       >
         <Avatar
           alt="Nguyen Sinh Tien"
-          src={ImageUser}
+          src={userState?.avatar || ImageUser}
           sx={{ width: 40, height: 40 }}
         />
         <Box>
@@ -25,7 +40,7 @@ function Comment({ ImageUser }) {
               fontSize: "16px",
             }}
           >
-            Minh Q.
+            {`${userState?.lastName} ${userState?.firstName}`}
           </Typography>
           <Rating
             sx={{ fontSize: "16px" }}
@@ -40,8 +55,7 @@ function Comment({ ImageUser }) {
           color: "#2d2f31",
         }}
       >
-        Mong có thêm khoá nâng cao hơn nữa, Học chỉ trông đến mấy bài labs để áp
-        dụng và hiểu lý thuyết đã học.
+        {rateState?.comment}
       </Typography>
     </Box>
   );

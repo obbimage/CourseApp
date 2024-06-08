@@ -10,7 +10,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { Link } from 'react-router-dom';
 import { clearToken } from '../../hook/token';
-import { useContext } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { CurrentUserContext } from '../../App';
 import AvatarCustom from './AvatarCustom';
 
@@ -120,24 +120,39 @@ const ItemComponent = ({ listItem, open }) => {
         })
     );
 }
-export default function NavigationBar({ open, handleToggle, handleOnMouseEnter, handleOnMuoseLeave }) {
-    const {currentUser,setCurrentUser} = useContext(CurrentUserContext);
+export default function NavigationBar({handleToggle, onMouseEnter, onMuoseLeave }) {
+    const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
+    const [openState, setOpenState] = useState(false);
     const theme = useTheme();
+
 
     const handleLogOut = () => {
         setCurrentUser({})
         clearToken();
     }
+    const handleOnMouseEnter = () => {
+        if (onMouseEnter) {
+            onMuoseLeave();
+        }
+        setOpenState(true);
+    }
+    const handleOnMouseLeave = () => {
+        setOpenState(false);
+        if (onMuoseLeave) {
+            onMuoseLeave();
+        }
+    }
+
     return (
-        <div onMouseEnter={handleOnMouseEnter} onMouseLeave={handleOnMuoseLeave}>
-            <Drawer variant="permanent" open={open}>
+        <div onMouseEnter={handleOnMouseEnter} onMouseLeave={handleOnMouseLeave}>
+            <Drawer variant="permanent" open={openState}>
                 <DrawerHeader>
-                    <Box  flexGrow={1} display={open ? 'flex' : 'none'} justifyContent='flex-start'>
+                    <Box flexGrow={1} display={openState ? 'flex' : 'none'} justifyContent='flex-start'>
                         <Box sx={{
-                            width: '45px', 
+                            width: '45px',
                             height: '45px',
                         }}>
-                            
+
                             <AvatarCustom src={currentUser.avatar} name={`${currentUser.lastName} ${currentUser.firstName}`} />
                         </Box>
                         <Box sx={{
@@ -148,14 +163,14 @@ export default function NavigationBar({ open, handleToggle, handleOnMouseEnter, 
                         </Box>
                     </Box>
                     <IconButton onClick={handleToggle}>
-                        {!open ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+                        {!openState ? <ChevronRightIcon /> : <ChevronLeftIcon />}
                     </IconButton>
                 </DrawerHeader>
                 <Divider />
                 <List>
                     <ListItem disablePadding sx={{ display: 'block', color: 'inherit' }} >
                         <ItemComponent
-                            open={open}
+                            open={openState}
                             listItem={listItemNavCourse} />
                     </ListItem>
                 </List>
@@ -163,7 +178,7 @@ export default function NavigationBar({ open, handleToggle, handleOnMouseEnter, 
                 <List>
                     <ListItem disablePadding sx={{ display: 'block' }} >
                         <ItemComponent
-                            open={open}
+                            open={openState}
                             listItem={listItemNavAccount} />
                         <ListItemButton
                             onClick={handleLogOut}>

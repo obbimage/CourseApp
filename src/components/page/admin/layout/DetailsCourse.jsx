@@ -1,12 +1,18 @@
 import { Accordion, AccordionDetails, AccordionSummary, Box, Button, Divider, Tooltip, Typography, useTheme } from "@mui/material";
 import LayoutAdmin, { LayoutContentAdmin, LayoutHeaderAdmin } from "./LayoutAdmin";
 import Video from "../../../video/Video";
-import { Children } from "react";
+import { Children, useEffect, useState } from "react";
 import { Block, Height } from "@mui/icons-material";
 import AvatarCustom from "../../../layouts/AvatarCustom";
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { grey } from "@mui/material/colors";
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
+import { useParams } from "react-router-dom";
+import { getCourseById } from "../../../../api/course";
+import { handleApiResponse } from "../../../../api/instance";
+import convertStringHtml from "../../user/components/convertStringToHtml";
+import { getUnitsByCourseId } from "../../../../api/unit";
+import { getSectionByUnitId } from "../../../../api/section";
 
 
 const Title = ({ children }) => {
@@ -62,7 +68,24 @@ const BlockInfoLeftCourse = ({ children }) => {
 }
 
 const UnitList = ({ value }) => {
-    const unit = value;
+    const [unit, setUnit] = useState(value);
+    const [sections, setSections] = useState([]);
+
+    useEffect(() => {
+        setUnit(value);
+        console.log(unit)
+
+        let unitId = value.id
+        getSectionByUnitId(unitId)
+            .then(response => {
+                handleApiResponse(response,
+                    // success
+                    (sectionResponse) => {
+                        setSections(sectionResponse);
+                    }
+                )
+            })
+    }, [value])
 
     const theme = useTheme();
     return (
@@ -78,85 +101,22 @@ const UnitList = ({ value }) => {
                 backgroundColor: grey[200],
             }}
                 expandIcon={<ArrowDropDownIcon />}>
-                <Content>Phần {unit?.numberUnit}: {unit?.name}</Content>
+                {/* <Content>Phần {unit?.numberUnit}: {unit?.name}</Content> */}
+                <Content>{unit?.title}</Content>
             </AccordionSummary>
-            <SectionList
-                value={{
-                    numberSection: 1,
-                    name: 'HTML là gì và cài đặt môi trường'
+            {
+                sections.map(section => {
+                    return (
+                        <SectionList
+                            value={{
+                                numberSection: section.numberSection,
+                                name: section.title
 
-                }}
-            />
-            <SectionList
-                value={{
-                    numberSection: 2,
-                    name: 'Syntax và quy tắc code HTML'
-
-                }}
-            />
-            <SectionList
-                value={{
-                    numberSection: 3,
-                    name: 'HTML thẻ img ảnh và a để link url'
-
-                }}
-            />
-            <SectionList
-                value={{
-                    numberSection: 4,
-                    name: 'HTML table Tag - Vẽ bảng biểu trên web'
-
-                }}
-            />
-            <SectionList
-                value={{
-                    numberSection: 5,
-                    name: 'HTML List Tag - ul, ol, dl để làm menu, danh sách'
-
-                }}
-            />
-            <SectionList
-                value={{
-                    numberSection: 6,
-                    name: 'HTML là gì và cài đặt môi trường'
-
-                }}
-            />
-            <SectionList
-                value={{
-                    numberSection: 7,
-                    name: 'HTML block tag - thẻ div, span chia khối'
-
-                }}
-            />
-            <SectionList
-                value={{
-                    numberSection: 8,
-                    name: 'HTML iframe tag - nhúng nội dung website khác vào web'
-
-                }}
-            />
-            <SectionList
-                value={{
-                    numberSection: 9,
-                    name: 'HTML Symbols - Ký hiệu đặc biệt trên web'
-
-                }}
-            />
-            <SectionList
-                value={{
-                    numberSection: 10,
-                    name: 'HTML Layout - Phân chia giao diện thành phần riêng lẻ'
-
-                }}
-            />
-            <SectionList
-                value={{
-                    numberSection: 11,
-                    name: 'HTML các thẻ form cơ bản hay dùng'
-
-                }}
-            />
+                            }}
+                        />
+                    )
+                })
+            }
         </Accordion>
     )
 };
@@ -182,7 +142,37 @@ const SectionList = ({ value }) => {
 }
 export default function DetailsCourse() {
     const theme = useTheme();
+    const pargram = useParams();
+    const [course, setCourse] = useState({});
 
+    const [units, setUnits] = useState([]);
+
+    useEffect(() => {
+        let courseId = pargram.courseId;
+        if (courseId) {
+            getCourseById(courseId)
+                .then(response => {
+                    handleApiResponse(response,
+                        // success
+                        (courseResponse) => {
+                            setCourse(courseResponse);
+                        }
+                    )
+                })
+
+            // get units
+            getUnitsByCourseId(courseId)
+                .then(response => {
+                    handleApiResponse(response,
+                        //sucess
+                        (unitsResponse) => {
+                            console.log(unitsResponse)
+                            setUnits(unitsResponse);
+                        }
+                    )
+                })
+        }
+    }, []);
     return (
         <LayoutAdmin>
             <LayoutHeaderAdmin>
@@ -200,17 +190,15 @@ export default function DetailsCourse() {
                         </Box>
                         <Box>
                             <Box>
-                                <Title>HTML/CSS cho người mới bắt đầu 2023</Title>
-                                <Content>Khóa học này cung cấp cho bạn kiến thức nền tảng về HTML và CSS,
-                                    hai ngôn ngữ lập trình cốt lõi để xây dựng trang web</Content>
+                                <Title>{course?.name}</Title>
+                                <Content>{course?.summary}</Content>
                             </Box>
                             <Divider />
                             <Box>
                                 <BlockInfoCourse>
                                     <BlockInfoLeftCourse>Mô tả</BlockInfoLeftCourse>
                                     <BlockInfoRightCourse>
-                                        Khóa học là lựa chọn tốt cho những ai muốn bắt đầu học lập trình web với việc tìm hiểu thiết kế giao diện gồm 2 thành phần chính là HTML và CSS
-                                        Khóa học này cung cấp cho bạn kiến thức nền tảng về HTML và CSS, hai ngôn ngữ lập trình cốt lõi để xây dựng trang web.
+                                        {convertStringHtml(course?.description || "")}
                                     </BlockInfoRightCourse>
                                 </BlockInfoCourse>
                                 <Divider />
@@ -224,15 +212,11 @@ export default function DetailsCourse() {
                                                         src={"https://img-c.udemycdn.com/user/200_H/173508024_80bd_3.jpg"} />
                                                 </Box>
                                                 <Box>
-                                                    <Title1>Thúy Nguyễn</Title1>
-                                                    <Content>Programming Academy</Content>
+                                                    <Title1>{`${course?.user?.lastName} ${course?.user?.firstName}`}</Title1>
+                                                    <Content>{course?.user?.educator?.biography}</Content>
                                                 </Box>
                                             </Box>
-                                            <Content>
-                                                Hello World
-                                                Thuy Nguyen IO focuses on training software programming such as Website, Mobile Apps, Games, Blockchain, AI, etc. We offers a wide range of courses from basic languages to cutting-edge technologies. We emphasizes clear, practical learning with dedicated support and a strong community, empowering individuals
-                                                Many thanks to all you
-                                            </Content>
+                                            <Content>{course?.user?.educator?.description}</Content>
                                         </Box>
                                     </BlockInfoRightCourse>
                                 </BlockInfoCourse>
@@ -245,11 +229,11 @@ export default function DetailsCourse() {
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', padding: theme.spacing(2) }}>
                             <Title1>Nội dung khóa học</Title1>
                             <Box>
-                                <Tooltip 
-                                sx={{
-                                    marginRight:theme.spacing(0.5)
-                                }}
-                                title="Khóa học không đủ tiêu chuẩn để xuất bản">
+                                <Tooltip
+                                    sx={{
+                                        marginRight: theme.spacing(0.5)
+                                    }}
+                                    title="Khóa học không đủ tiêu chuẩn để xuất bản">
                                     <Button variant="contained" color="error">
                                         Hủy
                                     </Button>
@@ -261,16 +245,12 @@ export default function DetailsCourse() {
                                 </Tooltip>
                             </Box>
                         </Box>
-                        <UnitList
-                            value={{
-                                numberUnit: 1,
-                                name: 'Học phần HTML'
-                            }} />
-                        <UnitList
-                            value={{
-                                numberUnit: 2,
-                                name: 'Học phần CSS'
-                            }} />
+                        {units.map(unit => {
+                            return (
+                                <UnitList
+                                    value={unit} />
+                            );
+                        })}
                     </Box>
 
                 </Box>

@@ -23,6 +23,8 @@ export default function CardCourse({ course }) {
         setStorageCourseId(courseId);
         navigate('edit');
     }
+    useEffect(() => {
+    }, [])
 
     return (
         // 345px
@@ -37,12 +39,20 @@ export default function CardCourse({ course }) {
                     }}>
                         <Chip
                             color="error"
-                            label="Bản nháp"
+                            label="Không xuất bản"
+                        />
+                    </Box>
+                    <Box sx={{
+                        display: course.confirm ? 'inline-block' : 'none'
+                    }}>
+                        <Chip
+                            color="success"
+                            label="Đã duyệt"
                         />
                     </Box>
                 </Box>
-                <Typography gutterBottom variant="h5" component="div">
-                    {course.name || 'underfind'}
+                <Typography gutterBottom variant="h6" component="div">
+                    {course.name && course.name.length > 20 ? `${course.name.substring(0, 20)}...` : (course.name || 'undefined')}
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
                     Ngày tạo:  {course.dateUpload}
@@ -53,7 +63,11 @@ export default function CardCourse({ course }) {
             </CardContent>
             <CardActions>
                 <Button onClick={handleEdit} size="small">Chỉnh Sửa</Button>
-                <Button size="small">Chi tiết</Button>
+                <Link/>
+                <Button
+                    component={Link}
+                    href={`/course/${course.id}/learn`}
+                    size="small">Chi tiết</Button>
             </CardActions>
         </Card>
     )

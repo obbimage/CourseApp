@@ -4,10 +4,11 @@ import { Box, Button, Chip, Link, Typography, useTheme } from "@mui/material";
 import EditNavbarCourse from "./NavEditbarCourse";
 import Intended from './editCourses/Intended';
 import { Outlet } from 'react-router-dom';
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { CourseContext } from '../../../provider/CourseProvider';
 import { getStorageCourseId } from '../../../util/localStorage';
 import { getCourseById } from '../../../api/course';
+import { handleApiResponse } from '../../../api/instance';
 
 
 
@@ -15,6 +16,7 @@ export default function EditCourse() {
     const theme = useTheme();
 
     const { courseProvider, setCourseProvider } = useContext(CourseContext);
+    const [course, setCourse] = useState({});
 
     useEffect(() => {
         const idCourse = getStorageCourseId();
@@ -22,7 +24,13 @@ export default function EditCourse() {
         if (idCourse !== null) {
             getCourseById(idCourse)
                 .then(response => {
-                    setCourseProvider(response.data.data);
+                    handleApiResponse(response,
+                        //success
+                        (data) => {
+                            setCourseProvider(data);
+                            setCourse(data);
+                        }
+                    )
                 })
         }
     }, [])
@@ -58,8 +66,8 @@ export default function EditCourse() {
                     </Link>
                     <Chip
                         variant="contained"
-                        color="error"
-                        label="Bản nháp" />
+                        color={course.complete ? "success" : "error"}
+                        label={course.complete ? "Đã xuất bản" : "Bản nháp"} />
                     <Typography sx={{ color: 'white', margin: theme.spacing(0, 1) }}>
                         {courseProvider.name}
                     </Typography>
@@ -69,13 +77,16 @@ export default function EditCourse() {
                     boxShadow: 'none',
                     cursor: 'pointer'
                 }}
-                href="setting"
+                    href="setting"
                 >
                     <SettingsIcon />
                 </Link>
             </Box>
             <Box sx={{ display: 'flex', justifyContent: 'center', padding: theme.spacing(5, 2) }}>
-                <EditNavbarCourse />
+                <EditNavbarCourse
+                    courseId = {course.id}
+                    isCourseConfirm={course.confirm}
+                />
                 <Outlet />
             </Box>
             <Box>

@@ -9,6 +9,7 @@ import TextFieldPassword from "../../layouts/TextFieldPassword";
 import { stringAlert } from "../../../static/stringAlert";
 import theme from "../../../theme";
 import TextLine from "../../layouts/TextLine";
+import { StringLink } from "../../../static/StringLink";
 
 export default function LoginAdmin({ onLoginSuccess }) {
 
@@ -46,21 +47,6 @@ export default function LoginAdmin({ onLoginSuccess }) {
             isValidate = false;
         };
         if (isValidate) {
-            // loginEducator(userName, password)
-            //     .then((response) => {
-            //         handleApiResponse(response,
-            //             (data) => {
-            //                 setToken(data.token);
-            //                 setCurrentUser(data.user)
-            //                 if (onLoginSuccess) {
-            //                     onLoginSuccess();
-            //                 }
-            //             },
-            //             () => {
-            //                 setIsShowLoginFailed(true);
-            //             }
-            //         )
-            //     });
             loginAdmin(userName, password)
                 .then(response => {
                     handleApiResponse(response,
@@ -69,6 +55,8 @@ export default function LoginAdmin({ onLoginSuccess }) {
                             setCurrentUser(data.user)
                             if (onLoginSuccess) {
                                 onLoginSuccess();
+                                // Chuyển hướng đế trang admin
+                                navigate(StringLink.toAdmin);
                             }
                         },
                         () => {

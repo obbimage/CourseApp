@@ -6,7 +6,7 @@ import TabList from '@mui/lab/TabList';
 import TabPanel from '@mui/lab/TabPanel';
 import { useEffect, useState } from "react";
 import LayoutAdmin, { LayoutContentAdmin } from "./layout/LayoutAdmin";
-import { getAllCourseRole, getCourseRoleById, insertCourseRole } from "../../../api/roleCourse";
+import { getAllCourseRole, getCourseRoleById, insertCourseRole, toggleAllowRole } from "../../../api/roleCourse";
 import { handleApiResponse } from "../../../api/instance";
 import { getSubRoleCourseByCourseId, insertSubRole } from "../../../api/subRole";
 import { containsOnlySpaces } from "../../../js/String";
@@ -19,12 +19,15 @@ import { getAllLanguage } from "../../../api/language";
 const ListData = ({ value, sx, onChange }) => {
     const [data, setData] = useState(value || []);
     const [selectedIndex, setSelectedIndex] = useState(0);
-
+    
 
     useEffect(() => {
         setData(value);
     }, [value]);
 
+    useEffect(()=>{
+        console.log(data);
+    },[data])
     const handleSelected = (e, value, index) => {
         setSelectedIndex(index);
 
@@ -32,7 +35,21 @@ const ListData = ({ value, sx, onChange }) => {
             onChange(value);
         }
     }
+    const handleToggle = (e, index, item) => {
+        let id = item.id;
 
+        toggleAllowRole(id)
+            .then(response => {
+                handleApiResponse(response,
+                    // success
+                    (dataResponse) => {
+                        let newData = data;
+                        newData[index] = dataResponse;
+                        setData(newData);
+                    }
+                )
+            })
+    }
     return (
         <List sx={{ ...sx }}>
             {
@@ -44,9 +61,14 @@ const ListData = ({ value, sx, onChange }) => {
                             onClick={(e) => handleSelected(e, item.id, index)}
                         >
                             <ListItemText primary={item.name} />
-                            <Tooltip title="Educator Không thể chọn thể loại này khi tắt đi">
-                                <Button>Tắt</Button>
-                            </Tooltip>
+                            {/* <Tooltip title="Educator Không thể chọn thể loại này khi tắt đi">
+                                <Button
+                                    onClick={(e) => handleToggle(e, index, item)}
+                                    color={item.allow ? "success" : "error"}
+                                >
+                                    {item.allow ? "Tắt" : "Bật"}
+                                </Button>
+                            </Tooltip> */}
                         </ListItemButton>
                     );
                 })
@@ -352,13 +374,13 @@ export default function Data() {
                             </TabPanel>
                             <TabPanel value="2">
                                 <Box sx={{
-                                    display:'flex',
-                                    justifyContent:'center'
+                                    display: 'flex',
+                                    justifyContent: 'center'
                                 }}>
                                     <Paper sx={{
-                                        width:'600px'
+                                        width: '600px'
                                     }}>
-                                            <LanguageList/>
+                                        <LanguageList />
                                     </Paper>
                                 </Box>
                             </TabPanel>

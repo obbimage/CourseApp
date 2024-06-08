@@ -71,8 +71,6 @@ export default function HeaderLaptop({ isLogin, setIsLogin, isInfoPage, currentU
   const [isValue, setIsValue] = React.useState(false);
   const [searchValue, setSearchValue] = React.useState("");
 
-  console.log(currentUser)
-
   const isScrolled = useScrollTrigger({
     disableHysteresis: true,
     threshold: 200,
@@ -97,6 +95,9 @@ export default function HeaderLaptop({ isLogin, setIsLogin, isInfoPage, currentU
     e.target.value ? setIsValue(true) : setIsValue(false);
   };
 
+  const handleClickSearch = ()=>{
+    console.log("click")
+  }
   return (
     <Box
       sx={{
@@ -186,6 +187,7 @@ export default function HeaderLaptop({ isLogin, setIsLogin, isInfoPage, currentU
               />
               {isValue && (
                 <IconButton
+                  onClick={handleClickSearch}
                   component={Link}
                   to={`/search?course-name=${searchValue}`}
                   sx={{
@@ -224,7 +226,7 @@ export default function HeaderLaptop({ isLogin, setIsLogin, isInfoPage, currentU
                   </Typography>
                 )}
 
-                <IconButton
+                {/* <IconButton
                   size="large"
                   aria-label="show 17 new notifications"
                   color="#707070"
@@ -232,7 +234,7 @@ export default function HeaderLaptop({ isLogin, setIsLogin, isInfoPage, currentU
                   <Badge badgeContent={17} color="error">
                     <ShoppingCartIcon />
                   </Badge>
-                </IconButton>
+                </IconButton> */}
                 {/* avatar khi dang nhap */}
                 <Box component={Link} to="/info">
                   <ImageCustom
