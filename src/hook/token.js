@@ -1,21 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const TOKEN = 'token';
 
 export default function useToken() {
 
-    const getToken = () => {
+    const [token, setToken] = useState(null);
+
+    useEffect(() => {
         const tokenString = localStorage.getItem(TOKEN);
         const userToken = tokenString;
-        /*UserToken?.Token
-            nếu userToken rỗng thì trả về null hoặc underfind
-            nếu không rỗng thì trả về thuộc tính token
-    
-        */
-        return userToken;
-    }
-
-    const [token, setToken] = useState(getToken());
+        setToken(userToken);
+    }, []);
 
     const saveToken = (userToken) => {
         if (userToken === "") {
@@ -27,8 +22,8 @@ export default function useToken() {
     }
 
     return {
-        setToken: saveToken,
-        token
+        token,
+        setToken: saveToken
     }
 }
 

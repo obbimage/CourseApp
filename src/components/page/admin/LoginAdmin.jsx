@@ -51,6 +51,7 @@ export default function LoginAdmin({ onLoginSuccess }) {
                 .then(response => {
                     handleApiResponse(response,
                         (data) => {
+                            console.log(data)
                             setToken(data.token);
                             setCurrentUser(data.user)
                             if (onLoginSuccess) {

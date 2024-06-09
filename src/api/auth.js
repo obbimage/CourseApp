@@ -5,6 +5,8 @@ const ROLE_EDUCATOR = 'educator'
 const URL_REGISTER = '/register';
 const URL_LOGIN = '/auth'
 
+const URL_USER = '/user';
+
 const loginRequest = (userName, password) => {
     return {
         username: userName,
@@ -137,31 +139,19 @@ export async function updateUser(id, user) {
 }
 
 export async function updateAvatar(id, files) {
-    // try {
-    //     const formData = new FormData();
-    //     console.log(files)
-    //     formData.append('file', files[0], files[0].name);
-
-    //     const response = await instance.post(`/user/updateAvatar/${id}`, formData, {
-    //         headers: {
-    //             'Content-Type': 'multipart/form-data'
-    //         }
-    //     })
-    //     return response;
-    // } catch (err) {
-    //     console.log(err)
-    //     if (err.response) {
-    //         return { status: err.response.status }
-    //     }
-    //     return null;
-    // }
     const formData = new FormData();
     formData.append('file', files[0], files[0].name);
     return handleApiRequest(async () => {
-        return await await instance.post(`/user/updateAvatar/${id}`, formData, {
+        return await instance.post(`/user/updateAvatar/${id}`, formData, {
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
         })
     });
+}
+
+export async function getAllEducator(){
+    return handleApiRequest(async ()=>{
+        return await instance.get(`${URL_USER}/${ROLE_EDUCATOR}`);
+    })
 }
