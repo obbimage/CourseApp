@@ -2,7 +2,6 @@ import { Avatar } from "@mui/material";
 import AvatarLetter from "./AvatarLetter";
 
 export default function AvatarCustom({ src, name }) {
-
     return (
         <>
             {
