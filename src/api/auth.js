@@ -150,8 +150,22 @@ export async function updateAvatar(id, files) {
     });
 }
 
-export async function getAllEducator(){
+export async function getAllEducator(pageNumber, pageSize) {
+    // nếu có truyền tham số
+    if (pageNumber !== undefined && pageSize !== undefined) {
+        return handleApiRequest(async () => {
+            return await instance.get(`${URL_USER}/${ROLE_EDUCATOR}/page/${pageNumber}/${pageSize}`);
+        });
+        // nếu không có tham số được truyền vào
+    } else {
+        return handleApiRequest(async () => {
+            return await instance.get(`${URL_USER}/${ROLE_EDUCATOR}`);
+        });
+    }
+}
+
+export async function findeEducators(search, pageSize, pageNumber){
     return handleApiRequest(async ()=>{
-        return await instance.get(`${URL_USER}/${ROLE_EDUCATOR}`);
+        return await instance.get(`${URL_USER}/${ROLE_EDUCATOR}/search/${search}/page/${pageSize}/${pageNumber}`);
     })
 }

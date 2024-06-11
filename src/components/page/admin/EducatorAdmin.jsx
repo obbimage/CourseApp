@@ -22,10 +22,10 @@ import CloseIcon from '@mui/icons-material/Close';
 import PhoneIcon from '@mui/icons-material/Phone';
 import PlaceIcon from '@mui/icons-material/Place';
 
-import { Avatar, Button, Divider, FormControl, Grid, Icon, Input, InputAdornment, InputLabel, MenuItem, OutlinedInput, Select, styled } from '@mui/material';
+import { Avatar, Button, Divider, FormControl, Grid, Icon, Input, InputAdornment, InputLabel, MenuItem, OutlinedInput, Pagination, Select, styled } from '@mui/material';
 import theme from '../../../theme';
 import React, { useEffect, useState } from 'react';
-import { getAllEducator } from '../../../api/auth';
+import { findeEducators, getAllEducator } from '../../../api/auth';
 import { handleApiRequest, handleApiResponse } from '../../../api/instance';
 import LayoutAdmin, { LayoutContentAdmin } from './layout/LayoutAdmin';
 import AvatarCustom from '../../layouts/AvatarCustom';
@@ -222,6 +222,7 @@ function Row({ value }) {
     const [user, setUser] = useState(value);
     const [educator, setEducator] = useState({});
     const [open, setOpen] = useState(false);
+
     useEffect(() => {
         setUser(value);
         setEducator(value.educator);
@@ -264,11 +265,23 @@ function Row({ value }) {
     );
 }
 
-function InputSearch({ placeholder, sx }) {
+function InputSearch({ placeholder, sx, onChange, onClickSearch }) {
+    const handleChange = (e) => {
+        let value = e.target.value;
+        if (onChange) {
+            onChange(value);
+        }
+    }
+    const handleClickButton = () => {
 
+        if (onClickSearch) {
+            onClickSearch();
+        }
+    }
     return (
         <FormControl >
             <OutlinedInput
+                onChange={handleChange}
                 sx={{
                     height: theme.spacing(5),
                     ...sx
@@ -276,7 +289,7 @@ function InputSearch({ placeholder, sx }) {
                 placeholder={placeholder || "Tìm kiếm"}
                 endAdornment={
                     <InputAdornment position='end'>
-                        <IconButton>
+                        <IconButton onClick={handleClickButton}>
                             <SearchIcon />
                         </IconButton>
                     </InputAdornment>
@@ -294,7 +307,7 @@ function SortBySelect({ onChange }) {
         let valueItem = e.target.value;
         setValue(valueItem);
         if (onChange) {
-            onChange(value);
+            onChange(valueItem);
         }
     }
     return (
@@ -316,14 +329,15 @@ function SortBySelect({ onChange }) {
                     width: theme.spacing(20)
                 }}
                 onChange={handleOnChange}
+                value={value}
             >
-                {/* <MenuItem value="">
-                    <em>Sort by</em>
-                </MenuItem> */}
+                <MenuItem value="">
+                    <em>None</em>
+                </MenuItem>
                 <MenuItem value={"id"}>ID</MenuItem>
-                <MenuItem value={'name'}>name</MenuItem>
+                <MenuItem value={'lastName'}>name</MenuItem>
                 <MenuItem value={'phone'}>Phone</MenuItem>
-                <MenuItem value={'course total'}>Course total</MenuItem>
+                {/* <MenuItem value={'course total'}>Course total</MenuItem> */}
             </Select>
         </FormControl>
     )
@@ -331,18 +345,83 @@ function SortBySelect({ onChange }) {
 
 export default function EducatorAdmin() {
     const [educators, setEducators] = useState([]);
+    const [educatorsOrgin, setEducatorsOrigin] = useState([]);
+
+    const [sortBy, setSortBy] = useState("");
+    const [pageTotal, setPageTotal] = useState(1);
+    const [pageSize, setPageSize] = useState(10)
+    const [pageNumber, setPageNumber] = useState(0);
+
+    const [search, setSearch] = useState("");
 
     useEffect(() => {
-        getAllEducator()
+        getAllEducator(pageNumber, pageSize)
             .then(response => {
                 handleApiResponse(response,
                     // success
-                    (educatorResponse) => {
+                    (response) => {
+                        let totalPageResponse = response.totalPages;
+                        setPageTotal(totalPageResponse);
+                        let educatorResponse = response.content;
                         setEducators(educatorResponse);
+                        setEducatorsOrigin(educatorResponse);
                     }
                 )
             })
-    }, [])
+    }, [pageNumber]);
+
+    useEffect(() => {
+        // console.log(educators)
+    }, [educators])
+
+    useEffect(() => {
+        if (!sortBy) {
+            setEducators([...educatorsOrgin]);
+        }
+        else {
+            console.log(sortBy)
+            let newValue = handleSortBy([...educatorsOrgin]);
+            setEducators(newValue);
+        }
+
+    }, [sortBy]);
+
+    const handleNumberPage = (e, page) => {
+        setPageNumber(page - 1);
+    }
+
+    // get key sort by
+    const handleSortByKey = (key) => {
+        setSortBy(key);
+    }
+    // get key when you have the key 
+    const handleSortBy = (value) => {
+        let reslut = value.sort((a, b) => {
+            if (a[sortBy] < b[sortBy]) {
+                return -1;
+            }
+            if (a[sortBy] > b[sortBy]) {
+                return 1;
+            }
+            return 0;
+        });
+        return reslut;
+    }
+
+    const handleChangeSearch = (value) => {
+        setSearch(value);
+    }
+    const handleClickButtonSearch = () => {
+        findeEducators(search,pageNumber,pageSize)
+        .then(response=>{
+            handleApiResponse(response,
+                // success
+                (response)=>{
+                    console.log(response);
+                }
+            )
+        })
+    }
     return (
         <LayoutAdmin>
             <LayoutContentAdmin sx={{ backgroundColor: 'inherit', marginTop: 0, paddingTop: theme.spacing(2) }}>
@@ -350,8 +429,10 @@ export default function EducatorAdmin() {
             </LayoutContentAdmin>
             <LayoutContentAdmin>
                 <Box sx={{ padding: theme.spacing(2), display: 'flex' }}>
-                    <InputSearch sx={{marginRight: theme.spacing(2)}} />
-                    <SortBySelect />
+                    <InputSearch sx={{ marginRight: theme.spacing(2) }} placeholder={"Id, Name, Phone"}
+                        onClickSearch={handleClickButtonSearch}
+                        onChange={handleChangeSearch} />
+                    <SortBySelect onChange={handleSortByKey} />
                 </Box>
                 <TableContainer component={Paper}>
                     <Table aria-label="collapsible table">
@@ -374,6 +455,10 @@ export default function EducatorAdmin() {
                         </TableBody>
                     </Table>
                 </TableContainer>
+                {/* <Divider/> */}
+                <Box sx={{ padding: theme.spacing(2), display: 'flex' }}>
+                    <Pagination count={pageTotal} variant='outlined' shape="rounded" onChange={handleNumberPage} />
+                </Box>
             </LayoutContentAdmin>
         </LayoutAdmin>
     );

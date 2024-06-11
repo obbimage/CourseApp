@@ -60,12 +60,13 @@ function Login({ isLogin, setIsLogin, setCurrentUser }) {
     loginUser(emailValue, passValue)
       .then(response => {
         handleApiResponse(response,
+          // success
           (dataResponse) => {
             if (setCurrentUser) {
               let user = dataResponse.user;
-              setCurrentUser(user);
+              let token = dataResponse.token;
+              setCurrentUser(user,token);
               setStorageUser(user);
-              let token = dataResponse.token
               setStorageTokenUser(token)
             }
             setIsLogin(true); // thay doi giao dien khi nguoi dung dan dang nhap thanh cong

@@ -384,7 +384,7 @@ function CourseItem() {
                         color: "#6a6f7a",
                       }}
                     >
-                      {`${course.user?.educator.biography}`}
+                      {`${course.user?.educator?.biography}`}
                     </Typography>
                   </Box>
                 </Box>
