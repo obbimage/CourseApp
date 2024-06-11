@@ -1,10 +1,12 @@
-import { Box, Paper, Typography, useTheme } from "@mui/material";
+import { Box, Card, CardContent, CardMedia, Paper, Typography, useTheme } from "@mui/material";
 import LayoutAdmin, { LayoutContentAdmin, LayoutHeaderAdmin } from "./layout/LayoutAdmin";
 import { useEffect, useState } from "react";
 import { handleApiResponse } from "../../../api/instance";
 import { getAllEducator } from "../../../api/auth";
+import AvatarCustom from "../../layouts/AvatarCustom";
 
 function Char() {
+    const theme = useTheme();
     const [countEducator, setCountEducator] = useState(0);
     const [educators, setEducators] = useState([]);
     useEffect(() => {
@@ -14,13 +16,12 @@ function Char() {
                     handleApiResponse(response,
                         // success
                         (educatorsResponse) => {
-                            console.log(educatorsResponse);
+                            setEducators(educatorsResponse);
                         }
                     )
                 )
             })
     }, [])
-    const theme = useTheme();
     return (
         <LayoutAdmin>
             <LayoutHeaderAdmin>
@@ -47,6 +48,21 @@ function Char() {
                 </Paper>
                 <Paper>
                     <Typography>Danh sách giảng viên</Typography>
+                    {educators.map((user) => {
+                        return (
+                            <Card key={user.id}>
+                                <CardContent>
+                                    <Box sx={{width: theme.spacing(3)}}>
+                                        <AvatarCustom
+                                            src={user.avatar}
+                                            name={user.firstName || user.username}
+                                        />
+                                    </Box>
+                                </CardContent>
+                                {user.lastName} {user.firstName}
+                            </Card>
+                        )
+                    })}
                 </Paper>
             </LayoutContentAdmin>
         </LayoutAdmin>

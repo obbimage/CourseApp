@@ -26,7 +26,6 @@ const ListData = ({ value, sx, onChange }) => {
     }, [value]);
 
     useEffect(()=>{
-        console.log(data);
     },[data])
     const handleSelected = (e, value, index) => {
         setSelectedIndex(index);
