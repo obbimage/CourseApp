@@ -19,8 +19,6 @@ export default function LoginAdmin({ onLoginSuccess }) {
     const [isNotValidPassword, setIsNotValidPassword] = useState(false) // dùng để toggle err input
     const [isShowLoginFaile, setIsShowLoginFailed] = useState(false); // toogle thông báo khi login faile
 
-    const { token, setToken } = useToken();
-
     const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
     const navigate = useNavigate();
 
@@ -51,9 +49,10 @@ export default function LoginAdmin({ onLoginSuccess }) {
                 .then(response => {
                     handleApiResponse(response,
                         (data) => {
-                            console.log(data)
-                            setToken(data.token);
-                            setCurrentUser(data.user)
+                            let user = data.user;
+                            let token = data.token
+                            // setToken(data.token);
+                            setCurrentUser(user,token);
                             if (onLoginSuccess) {
                                 onLoginSuccess();
                                 // Chuyển hướng đế trang admin
