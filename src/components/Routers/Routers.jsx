@@ -28,6 +28,7 @@ import MangerCourse from "../page/admin/MangerCourse";
 import DetailsCourse from "../page/admin/layout/DetailsCourse";
 import Char from "../page/admin/Char";
 import { StringLink } from "../../static/StringLink";
+import EducatorAdmin from "../page/admin/EducatorAdmin";
 
 export default function Routers() {
   const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
@@ -84,6 +85,7 @@ export default function Routers() {
         <Route path="course/:courseId/review" element={<DetailsCourse />} />
         <Route path="profile" element={<AdminProfile />} />
         <Route path="char" element={<Char />} />
+        <Route path="educator" element={<EducatorAdmin />} />
       </Route>
     </Routes>
   )
