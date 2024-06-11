@@ -1,6 +1,6 @@
 import { useTheme } from '@emotion/react';
 import styled from '@emotion/styled';
-import { Box, Divider, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from '@mui/material';
+import { Box, Collapse, Divider, IconButton, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Typography } from '@mui/material';
 import MuiDrawer from '@mui/material/Drawer';
 // icon
 import { AccountBox, InsertChart, LocalLibrary } from '@mui/icons-material';
@@ -10,9 +10,13 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import StorageIcon from '@mui/icons-material/Storage';
 import FolderIcon from '@mui/icons-material/Folder';
 import { Link } from 'react-router-dom';
+import ContactPhoneOutlinedIcon from '@mui/icons-material/ContactPhoneOutlined';
+import ExpandMoreOutlinedIcon from '@mui/icons-material/ExpandMoreOutlined';
+import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
+import ExpandLessOutlinedIcon from '@mui/icons-material/ExpandLessOutlined';
 
 import { clearToken } from '../../../../hook/token';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { CurrentUserContext } from '../../../../App';
 import AvatarCustom from '../../../layouts/AvatarCustom';
 
@@ -82,8 +86,8 @@ const listItemNavAccount = [
 
 const listItemNavCourse = [
     itemNav("Dữ liệu", <StorageIcon />, "data"),
-    itemNav("Duyệt khóa học", <FolderIcon/>,"course"),
-    itemNav("Thống kê",<InsertChart/>,"char")
+    itemNav("Duyệt khóa học", <FolderIcon />, "course"),
+    itemNav("Thống kê", <InsertChart />, "char")
 
 ]
 const ItemComponent = ({ listItem, open }) => {
@@ -104,7 +108,6 @@ const ItemComponent = ({ listItem, open }) => {
                         sx={{
                             minHeight: 48,
                             justifyContent: open ? 'initial' : 'center',
-                            px: 2.5,
                         }}
                     >
                         <ListItemIcon
@@ -125,16 +128,51 @@ const ItemComponent = ({ listItem, open }) => {
         })
     );
 }
-export default function NavigationBarAdmin({ open, handleToggle, onMouseEnter, onMouseLeave }) {
+
+function ListCustom() {
+    const [open, setOpen] = useState(false);
+    const handleToggleOpen = () => {
+        setOpen(!open);
+    }
+    return (
+        <>
+            <List>
+                <ListItemButton onClick={handleToggleOpen}>
+                    <ListItemIcon>
+                        <ContactPhoneOutlinedIcon />
+                    </ListItemIcon>
+                    <ListItemText primary="Khách hàng" />
+                    {
+                        open ? <ExpandLessOutlinedIcon /> : <ExpandMoreOutlinedIcon />
+                    }
+                </ListItemButton>
+            </List>
+            <Collapse in={open} unmountOnExit>
+                <List>
+                    <Link to={"educator"}>
+                        <ListItemButton sx={{ pl: 4 }}>
+                            <ListItemIcon>
+                                <SchoolOutlinedIcon />
+                            </ListItemIcon>
+                            <ListItemText primary="Educator" />
+                        </ListItemButton>
+                    </Link>
+                </List>
+            </Collapse>
+        </>
+    )
+}
+export default function NavigationBarAdmin({ handleToggle, onMouseEnter, onMouseLeave }) {
     const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
+    const [openState, setOpenState] = useState(true);
     const theme = useTheme();
 
     const handleLogOut = () => {
         setCurrentUser({})
         clearToken();
     }
-    const handleOnMouseEnter = ()=>{
-        if(onMouseEnter){
+    const handleOnMouseEnter = () => {
+        if (onMouseEnter) {
             onMouseEnter();
         }
     }
@@ -145,9 +183,9 @@ export default function NavigationBarAdmin({ open, handleToggle, onMouseEnter, o
     }
     return (
         <div onMouseEnter={handleOnMouseEnter} onMouseLeave={handleOnMouseLeave}>
-            <Drawer variant="permanent" open={open}>
+            <Drawer variant="permanent" open={openState}>
                 <DrawerHeader>
-                    <Box flexGrow={1} display={open ? 'flex' : 'none'} justifyContent='flex-start'>
+                    <Box flexGrow={1} display={openState ? 'flex' : 'none'} justifyContent='flex-start'>
                         <Box sx={{
                             width: '45px',
                             height: '45px',
@@ -162,23 +200,22 @@ export default function NavigationBarAdmin({ open, handleToggle, onMouseEnter, o
                             <Typography fontSize='15px' variant='subtitle2'>{currentUser.lastName} {currentUser.firstName}</Typography>
                         </Box>
                     </Box>
-                    <IconButton onClick={handleToggle}>
-                        {!open ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-                    </IconButton>
                 </DrawerHeader>
                 <Divider />
                 <List>
                     <ListItem disablePadding sx={{ display: 'block', color: 'inherit' }} >
                         <ItemComponent
-                            open={open}
+                            open={openState}
                             listItem={listItemNavCourse} />
                     </ListItem>
                 </List>
                 <Divider />
+                <ListCustom />
+                <Divider />
                 <List>
                     <ListItem disablePadding sx={{ display: 'block' }} >
                         <ItemComponent
-                            open={open}
+                            open={openState}
                             listItem={listItemNavAccount} />
                         <ListItemButton
                             onClick={handleLogOut}>

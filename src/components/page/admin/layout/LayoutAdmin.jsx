@@ -1,11 +1,14 @@
 import { Box, Divider, Typography, useTheme, useThemeProps } from "@mui/material";
+import { grey } from "@mui/material/colors";
 
+const backgroundColor = grey[300];
 
 export default function LayoutAdmin({ sx, children }) {
     const theme = useTheme();
     return (
         <Box sx={{
             width: '100%',
+            backgroundColor: backgroundColor,
             ...sx
         }}>
             {children}
@@ -17,7 +20,9 @@ export function LayoutContentAdmin({ sx, children }) {
     const theme = useTheme();
     return (
         <Box sx={{
-            margin: theme.spacing(3, 4),
+            margin: theme.spacing(3, 15),
+            backgroundColor:'#ffffff',
+
             ...sx
         }}>
             {children}
