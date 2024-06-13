@@ -47,8 +47,10 @@ export function handleApiResponse(response, onSuccess, onFailure, onComplete) {
             onSuccess(data); // goi ham neu thanh cong
         }
     } else {
-        if (onFailure)
-            onFailure(response); // goi ham khi that bai
+        if (onFailure) {
+            let error = response.data.message;
+            onFailure(error,response); // goi ham khi that bai
+        }
     }
     if (onComplete) {
         onComplete();

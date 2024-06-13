@@ -1,4 +1,4 @@
-import { Box, Button, InputBase, Typography, styled } from "@mui/material";
+import { Box, Button, CircularProgress, Dialog, DialogContent, InputBase, Typography, styled } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import ImageCustom from "./imageCustom";
 import logoImage from "../assets/images/f8-icon.18cd71cfcfa33566a22b.png";
@@ -40,7 +40,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   height: "44px",
 }));
 
-function Register({ isLogin, setIsLogin,setCurrentUser }) {
+function Register({ isLogin, setIsLogin, setCurrentUser }) {
   const [isFocusedEmail, setIsFocusedEmail] = useState(false);
   const [isFocusedPass, setIsFocusedPass] = useState(false);
   const [isFocusedPass2, setIsFocusedPass2] = useState(false);
@@ -49,35 +49,42 @@ function Register({ isLogin, setIsLogin,setCurrentUser }) {
   const [emailValue, setEmailValue] = useState("");
   const [passValue, setPassValue] = useState("");
   const [pass2Value, setPass2Value] = useState("");
-  const [open, setOpen] = useState(false);
+
+  const [openLoading, setOpenLoading] = useState(false);
+  const [openAlert, setOpenAlert] = useState(false);
+  const [alert, setAlert] = useState("");
 
   const navigate = useNavigate();
 
   // Đăng ký
   const handleSubmitLogin = async () => {
     setClickLogin(true); // hien thi chung voi loi khong nhap vao input
-    console.log(passValue.length < 8);
 
-    // console.log(passValue === "" || (passValue.length < 8 && passValue.length > 16));
     if (emailValue === "" || passValue === "" || pass2Value === "") return;
     if (passValue !== pass2Value || passValue.length < 8) return;
+
+    setOpenLoading(true);
+    // đăng ký tài khoản
     await registerUser(emailValue, passValue)
       .then(response => {
         handleApiResponse(response,
+          // success
           (dataResponse) => {
             setIsLogin(true); // thay doi giao dien khi nguoi dung dan dang nhap thanh cong
-            setCurrentUser(dataResponse)
-            setRegisterResult(false); // hien thi alert success or error
-            navigate("/");// chuyen ve trang chu
+            // setCurrentUser(dataResponse)
+            setRegisterResult(true); // hien thi alert success or error
+            // navigate("/");// chuyen ve trang chu
           },
+          // failed
           (err) => {
+            setAlert(err);
             setRegisterResult(false); // hien thi alert success or error
-            setOpen(false); //hien thi success hay error
+            setOpenAlert(false); //hien thi success hay error
           }
         )
       });
-
-    setOpen(true); //hien thi alert
+    setOpenLoading(false)
+    setOpenAlert(true); //hien thi alert
   };
 
   const handleClose = (event, reason) => {
@@ -85,7 +92,7 @@ function Register({ isLogin, setIsLogin,setCurrentUser }) {
       return;
     }
 
-    setOpen(false);
+    setOpenAlert(false);
   };
 
   const handleChangeEmail = (e) => {
@@ -133,6 +140,11 @@ function Register({ isLogin, setIsLogin,setCurrentUser }) {
         alignItems: "center",
       }}
     >
+      <Dialog open={openLoading}>
+        <DialogContent>
+          <CircularProgress />
+        </DialogContent>
+      </Dialog>
       <Box
         sx={{
           width: "94%",
@@ -325,8 +337,8 @@ function Register({ isLogin, setIsLogin,setCurrentUser }) {
 
             {registerResult ? (
               <Snackbar
-                open={open}
-                autoHideDuration={1000}
+                open={openAlert}
+                autoHideDuration={10000}
                 onClose={handleClose}
                 anchorOrigin={{ vertical: "top", horizontal: "center" }}
               >
@@ -336,13 +348,13 @@ function Register({ isLogin, setIsLogin,setCurrentUser }) {
                   variant="filled"
                   sx={{ width: "100%" }}
                 >
-                  Đăng ký thành công!
+                  Đăng ký thành công! vui lòng kiểm tra email để kích hoạt tài khoản
                 </Alert>
               </Snackbar>
             ) : (
               <Snackbar
-                open={open}
-                autoHideDuration={1000}
+                open={openAlert}
+                autoHideDuration={10000}
                 onClose={handleClose}
                 anchorOrigin={{ vertical: "top", horizontal: "center" }}
               >
@@ -352,7 +364,7 @@ function Register({ isLogin, setIsLogin,setCurrentUser }) {
                   variant="filled"
                   sx={{ width: "100%" }}
                 >
-                  Tài khoản đã tồn tại!
+                  {alert}
                 </Alert>
               </Snackbar>
             )}
