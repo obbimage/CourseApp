@@ -15,10 +15,12 @@ import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
 import { Link, useNavigate } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 import { insertBuy } from "../../../../api/buy";
-import { handleApiResponse } from "../../../../api/instance";
+import { handleApiRequest, handleApiResponse } from "../../../../api/instance";
 import { AlertFeddback } from "../../../feedback/AlertFeedback";
 import { CurrentUserContext } from "../../../../App";
 import { isObjEmpty } from "../../../../util/object";
+import { getUrlVnpay } from "../../../../api/pay/vnpay";
+import { StringLink } from "../../../../static/StringLink";
 
 
 function CourseItemLaptop({ isScrolled, value, isBuy }) {
@@ -29,6 +31,8 @@ function CourseItemLaptop({ isScrolled, value, isBuy }) {
   const [severityAlert, setSeverityAlert] = useState('success');
   const [isBuyState, setIsBuyState] = useState(false)
   const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
+
+  const [urlPay,setUrlPay] = useState("");
 
   const navigate = useNavigate();
 
@@ -48,24 +52,41 @@ function CourseItemLaptop({ isScrolled, value, isBuy }) {
   const handleBuyCourse = () => {
     let courseId = course.id;
     // kiểm tra đã đăng nhập hay chưa
-    if (!isObjEmpty(currentUser)) {
-      let useId = currentUser.id;
-      insertBuy(useId, courseId)
-        .then(response => {
-          handleApiResponse(response,
-            // success
-            (buyResponse) => {
-              navigate('/storage');
-            },
-            // falied
-            (err) => {
-              setAlert("Thanh toán thất bại");
-              setSeverityAlert("error");
-              setOpenAlert(true);
-            }
-          )
-        })
-    } else {
+    // if (!isObjEmpty(currentUser)) {
+    //   let useId = currentUser.id;
+    //   insertBuy(useId, courseId)
+    //     .then(response => {
+    //       handleApiResponse(response,
+    //         // success
+    //         (buyResponse) => {
+    //           navigate('/storage');
+    //         },
+    //         // falied
+    //         (err) => {
+    //           setAlert("Thanh toán thất bại");
+    //           setSeverityAlert("error");
+    //           setOpenAlert(true);
+    //         }
+    //       )
+    //     })
+    // } else {
+    //   navigate('/login');
+    // }
+
+
+    if(!isObjEmpty(currentUser)){
+      let userId = currentUser.id;
+      getUrlVnpay(StringLink.urlWeb+"/payment",userId,courseId)
+      .then(response=>{
+        handleApiResponse(response,
+          // success
+          (urlPayResponse)=>{
+            setUrlPay(urlPayResponse);
+            window.location.href = urlPayResponse;
+          }
+        )
+      })
+    }else{
       navigate('/login');
     }
   }

@@ -29,6 +29,8 @@ import DetailsCourse from "../page/admin/layout/DetailsCourse";
 import Char from "../page/admin/Char";
 import { StringLink } from "../../static/StringLink";
 import EducatorAdmin from "../page/admin/EducatorAdmin";
+import AfterPayment from "../page/user/payment/AfterPayment";
+import CharEducator from "../page/educator/CharEducator";
 
 export default function Routers() {
   const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
@@ -57,6 +59,7 @@ export default function Routers() {
 
   return (
     <Routes>
+      <Route path="payment" element={<AfterPayment />} />
       <Route path='/signup/educator' element={<Signup />} />
       <Route path='/login/educator' element={<Login onLoginSuccess={handleLoginSuccess} />} />
       <Route path='/changepassword' element={<ChangePassword />} />
@@ -74,8 +77,8 @@ export default function Routers() {
       </Route>
       <Route path="/educator" element={<Educator />}>
         <Route path="profile" element={<EducatorProfile />} />
-        <Route path='course' element={<EducatorCourse />}>
-        </Route>
+        <Route path='course' element={<EducatorCourse />}></Route>
+        <Route path='char' element={<CharEducator />} />
       </Route>
       <Route path="/login/admin" element={<LoginAdmin onLoginSuccess={handleLoginSuccess} />} />
       {/* <Route path="/signup/admin" element={<SignUpAdmin />} /> */}

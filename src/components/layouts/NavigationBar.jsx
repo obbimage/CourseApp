@@ -4,15 +4,17 @@ import { Box, Divider, IconButton, List, ListItem, ListItemButton, ListItemIcon,
 import MuiDrawer from '@mui/material/Drawer';
 import AvatarLetter from './AvatarLetter';
 // icon
-import { AccountBox, LocalLibrary } from '@mui/icons-material';
+import { AccountBox, BarChart, LocalLibrary } from '@mui/icons-material';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import LogoutIcon from '@mui/icons-material/Logout';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { clearToken } from '../../hook/token';
 import { useContext, useEffect, useState } from 'react';
 import { CurrentUserContext } from '../../App';
 import AvatarCustom from './AvatarCustom';
+import CharEducator from '../page/educator/CharEducator';
+import BarChartIcon from '@mui/icons-material/BarChart';
 
 const drawerWidth = 240;
 const openedMixin = (theme) => ({
@@ -79,6 +81,7 @@ const listItemNavAccount = [
 ];
 
 const listItemNavCourse = [
+    itemNav("Thống kê", <BarChart/>, "char"),
     itemNav("Khóa học", <LocalLibrary />, "course")
 ]
 const ItemComponent = ({ listItem, open }) => {
@@ -122,13 +125,16 @@ const ItemComponent = ({ listItem, open }) => {
 }
 export default function NavigationBar({handleToggle, onMouseEnter, onMuoseLeave }) {
     const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
-    const [openState, setOpenState] = useState(false);
+    const [openState, setOpenState] = useState(true);
     const theme = useTheme();
+
+    const navigate = useNavigate();
 
 
     const handleLogOut = () => {
         setCurrentUser({})
         clearToken();
+        navigate("/login/educator");
     }
     const handleOnMouseEnter = () => {
         if (onMouseEnter) {
@@ -137,7 +143,7 @@ export default function NavigationBar({handleToggle, onMouseEnter, onMuoseLeave 
         setOpenState(true);
     }
     const handleOnMouseLeave = () => {
-        setOpenState(false);
+        // setOpenState(false);
         if (onMuoseLeave) {
             onMuoseLeave();
         }
@@ -162,9 +168,9 @@ export default function NavigationBar({handleToggle, onMouseEnter, onMuoseLeave 
                             <Typography fontSize='15px' variant='subtitle2'>{currentUser.lastName} {currentUser.firstName}</Typography>
                         </Box>
                     </Box>
-                    <IconButton onClick={handleToggle}>
+                    {/* <IconButton onClick={handleToggle}>
                         {!openState ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-                    </IconButton>
+                    </IconButton> */}
                 </DrawerHeader>
                 <Divider />
                 <List>

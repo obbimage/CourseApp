@@ -72,7 +72,6 @@ function CourseItem() {
             // success
             (isResult) => {
               setIsBuy(isResult);
-              console.log(isResult)
             }
           )
         });
@@ -99,7 +98,6 @@ function CourseItem() {
           handleApiResponse(response,
             // success
             (whoCourseResponse) => {
-              console.log('whoCourse: ', whoCourseResponse)
               setWhoCourses(whoCourseResponse)
             }
           )
