@@ -164,8 +164,15 @@ export async function getAllEducator(pageNumber, pageSize) {
     }
 }
 
-export async function findeEducators(search, pageSize, pageNumber){
-    return handleApiRequest(async ()=>{
+export async function findeEducators(search, pageSize, pageNumber) {
+    return handleApiRequest(async () => {
         return await instance.get(`${URL_USER}/${ROLE_EDUCATOR}/search/${search}/page/${pageSize}/${pageNumber}`);
+    })
+}
+
+
+export async function getWallet() {
+    return handleApiRequest(async () => {
+        return await instance.get(`${URL_USER}/wallet`);
     })
 }
