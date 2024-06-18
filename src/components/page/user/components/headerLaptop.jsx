@@ -64,7 +64,12 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   },
 }));
 
-export default function HeaderLaptop({ isLogin, setIsLogin, isInfoPage, currentUser }) {
+export default function HeaderLaptop({
+  isLogin,
+  setIsLogin,
+  isInfoPage,
+  currentUser,
+}) {
   const navigate = useNavigate();
 
   const [isFocused, setIsFocused] = React.useState(false);
@@ -95,9 +100,9 @@ export default function HeaderLaptop({ isLogin, setIsLogin, isInfoPage, currentU
     e.target.value ? setIsValue(true) : setIsValue(false);
   };
 
-  const handleClickSearch = ()=>{
-    console.log("click")
-  }
+  const handleClickSearch = () => {
+    console.log("click");
+  };
   return (
     <Box
       sx={{
@@ -107,7 +112,7 @@ export default function HeaderLaptop({ isLogin, setIsLogin, isInfoPage, currentU
         top: 0,
         left: 0,
         right: 0,
-        zIndex: "10",
+        zIndex: "9999",
       }}
     >
       <AppBar
@@ -133,11 +138,7 @@ export default function HeaderLaptop({ isLogin, setIsLogin, isInfoPage, currentU
           }}
         >
           <Box sx={{ display: "flex", alignItems: "center" }}>
-            <Box
-              component={Link}
-              to="/"
-              sx={{ height: "38px", mr: "24px" }}
-            >
+            <Box component={Link} to="/" sx={{ height: "38px", mr: "24px" }}>
               <ImageCustom
                 src={logoImage}
                 alt="avatar"
@@ -238,7 +239,7 @@ export default function HeaderLaptop({ isLogin, setIsLogin, isInfoPage, currentU
                 {/* avatar khi dang nhap */}
                 <Box component={Link} to="/info">
                   <ImageCustom
-                    src={ currentUser?.avatar ? currentUser.avatar : ImageUser}
+                    src={currentUser?.avatar ? currentUser.avatar : ImageUser}
                     alt="account of current user"
                     sx={{
                       width: 30,

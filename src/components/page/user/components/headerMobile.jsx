@@ -24,7 +24,12 @@ import ImageCustom from "./imageCustom";
 import LogoutIcon from "@mui/icons-material/Logout";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 
-export default function HeaderMobile({ isLogin, setIsLogin, isInfoPage, currentUser}) {
+export default function HeaderMobile({
+  isLogin,
+  setIsLogin,
+  isInfoPage,
+  currentUser,
+}) {
   const [open, setOpen] = React.useState(false);
   const [toggleSearch, setToggleSearch] = React.useState(false);
 
@@ -77,7 +82,7 @@ export default function HeaderMobile({ isLogin, setIsLogin, isInfoPage, currentU
               mt: "16px",
             }}
           >
-            Cai Hoang Huynh
+            Nguyen Sinh Tien
           </Typography>
         </Box>
       ) : (

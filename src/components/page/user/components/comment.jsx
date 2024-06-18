@@ -9,13 +9,12 @@ function Comment({ ImageUser, rate }) {
     if (rate) {
       setRateState(rate);
     }
-
   }, [rate]);
 
   useEffect(() => {
     let user = rateState.user;
     setUserState(user);
-  }, [rateState])
+  }, [rateState]);
   return (
     <Box sx={{ p: "24px 0", borderTop: "1px solid #d1d7dc" }}>
       <Box

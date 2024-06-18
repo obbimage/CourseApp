@@ -55,21 +55,20 @@ function Section({
   setImageVideo,
   isBuy = false,
 }) {
-
   const [unitIdState, setUnitIdState] = React.useState(unitId);
   const [sections, setSections] = React.useState([]);
 
-
   React.useEffect(() => {
-    getSectionByUnitId(unitId)
-      .then(response => {
-        handleApiResponse(response,
-          // success
-          (sectionsResponse) => {
-            setSections(sectionsResponse);
-          }
-        )
-      })
+    getSectionByUnitId(unitId).then((response) => {
+      console.log(unitId);
+      handleApiResponse(
+        response,
+        // success
+        (sectionsResponse) => {
+          setSections(sectionsResponse);
+        }
+      );
+    });
   }, [unitIdState]);
 
   const handleWatchVideo = (id, urlVideo, courseVip) => {
@@ -84,6 +83,7 @@ function Section({
     setImageVideo(courseVip);
     // }
   };
+
   return (
     <AccordionDetails
       sx={{
@@ -92,39 +92,42 @@ function Section({
         p: "0",
       }}
     >
-      {
-        sections.map(section => {
-          return (
-            <Box key = {section.id}
-              onClick={(e) => {
-                handleWatchVideo(
-                  section.numberSection,
-                  section.urlVideo,
-                  courseVip1
-                );
-              }}
-              sx={{
-                display: "flex",
-                gap: "12px",
-                alignItems: "center",
-                p: "8px 24px",
-                backgroundColor: videoActive === section.numberSection ? "#d1d7dc" : "#fff",
-                "&:hover": {
-                  backgroundColor: "#d1d7dc",
-                  opacity: 0.8,
-                },
-                height: "42px",
-                cursor: "pointer",
-              }}
-            >
-              <OndemandVideoIcon sx={{ fontSize: "16px" }} />
-              <Typography sx={{ fontSize: "14px" }}>{section?.title}</Typography>
-            </Box>
-          );
-        })
-      }
+      {sections.map((section) => {
+        return (
+          <Box
+            key={section.id}
+            onClick={(e) => {
+              handleWatchVideo(
+                section.numberSection,
+                section.urlVideo,
+                courseVip1,
+                unitId
+              );
+            }}
+            sx={{
+              display: "flex",
+              gap: "12px",
+              alignItems: "center",
+              p: "8px 24px",
+              backgroundColor:
+                parseInt(videoActive) === section.numberSection
+                  ? "#d1d7dc"
+                  : "#fff",
+              "&:hover": {
+                backgroundColor: "#d1d7dc",
+                opacity: 0.8,
+              },
+              height: "42px",
+              cursor: "pointer",
+            }}
+          >
+            <OndemandVideoIcon sx={{ fontSize: "16px" }} />
+            <Typography sx={{ fontSize: "14px" }}>{section?.title}</Typography>
+          </Box>
+        );
+      })}
     </AccordionDetails>
-  )
+  );
 }
 
 function CourseInfo({
@@ -140,8 +143,7 @@ function CourseInfo({
   const [units, setUnits] = React.useState([]);
 
   React.useEffect(() => {
-    if (value)
-      setUnits(value);
+    if (value) setUnits(value);
   }, [value]);
   const handleChange = (panel) => (event, isExpanded) => {
     setExpanded(
@@ -154,39 +156,39 @@ function CourseInfo({
   const handleUrlVideo = (url) => {
     console.log(url);
     if (setUrlVideo) {
-      setUrlVideo(url)
+      setUrlVideo(url);
     }
-  }
+  };
 
   return (
     <Box>
-      {
-        units.map((unit, index) => {
-          return (
-            <Accordion
-              key={unit.id}
-              defaultExpanded
-              expanded={expanded.includes(`panel${index + 1}`)}
-              onChange={handleChange(`panel${index + 1}`)}
+      {units.map((unit, index) => {
+        return (
+          <Accordion
+            key={unit.id}
+            defaultExpanded
+            expanded={expanded.includes(`panel${index + 1}`)}
+            onChange={handleChange(`panel${index + 1}`)}
+          >
+            <AccordionSummary
+              aria-controls="panel1d-content"
+              id="panel1d-header"
             >
-              <AccordionSummary aria-controls="panel1d-content" id="panel1d-header">
-                <Typography sx={{ color: "#2d2f31", fontWeight: "600" }}>
-                  {unit.title}
-                </Typography>
-              </AccordionSummary>
-              <Section
-                unitId={unit.id}
-                videoActive={videoActive}
-                setVideoActive={setVideoActive}
-                setUrlVideo={handleUrlVideo}
-                setImageVideo={setImageVideo}
-                isBuy={isBuy}
-              />
-
-            </Accordion>
-          );
-        })
-      }
+              <Typography sx={{ color: "#2d2f31", fontWeight: "600" }}>
+                {unit.title}
+              </Typography>
+            </AccordionSummary>
+            <Section
+              unitId={unit.id}
+              videoActive={videoActive}
+              setVideoActive={setVideoActive}
+              setUrlVideo={handleUrlVideo}
+              setImageVideo={setImageVideo}
+              isBuy={isBuy}
+            />
+          </Accordion>
+        );
+      })}
     </Box>
   );
 }

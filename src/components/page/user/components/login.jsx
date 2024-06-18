@@ -6,7 +6,10 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { loginUser } from "../../../../api/auth";
 import { handleApiResponse } from "../../../../api/instance";
-import { setStorageTokenUser, setStorageUser } from "../../../../util/localStorage";
+import {
+  setStorageTokenUser,
+  setStorageUser,
+} from "../../../../util/localStorage";
 import logoImage from "../assets/images/f8-icon.18cd71cfcfa33566a22b.png";
 import ImageCustom from "./imageCustom";
 import { StringLink } from "../../../../static/StringLink";
@@ -24,8 +27,8 @@ const InputCustom = styled("div")(({ isFocused, isError }) => ({
   border: isFocused
     ? "1.5px solid #1dbfaf"
     : isError
-      ? "1.5px solid #f33a58"
-      : "1.5px solid rgba(22, 24, 35, .06)",
+    ? "1.5px solid #f33a58"
+    : "1.5px solid rgba(22, 24, 35, .06)",
 }));
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
@@ -57,28 +60,28 @@ function Login({ isLogin, setIsLogin, setCurrentUser }) {
     setClickLogin(true); // hien thi chung voi loi khong nhap vao input
     if (emailValue === "" || passValue === "") return;
 
-    loginUser(emailValue, passValue)
-      .then(response => {
-        handleApiResponse(response,
-          // success
-          (dataResponse) => {
-            if (setCurrentUser) {
-              let user = dataResponse.user;
-              let token = dataResponse.token;
-              setCurrentUser(user,token);
-              setStorageUser(user);
-              setStorageTokenUser(token)
-            }
-            setIsLogin(true); // thay doi giao dien khi nguoi dung dan dang nhap thanh cong
-            setLoginResult(true); // hien thi alert
-            navigate("/");// chuyen ve trang chu
-          },
-          (err) => {
-            console.log(err)
-            setLoginResult(false);
+    loginUser(emailValue, passValue).then((response) => {
+      handleApiResponse(
+        response,
+        // success
+        (dataResponse) => {
+          if (setCurrentUser) {
+            let user = dataResponse.user;
+            let token = dataResponse.token;
+            setCurrentUser(user, token);
+            setStorageUser(user);
+            setStorageTokenUser(token);
           }
-        )
-      });
+          setIsLogin(true); // thay doi giao dien khi nguoi dung dan dang nhap thanh cong
+          setLoginResult(true); // hien thi alert
+          navigate("/"); // chuyen ve trang chu
+        },
+        (err) => {
+          console.log(err);
+          setLoginResult(false);
+        }
+      );
+    });
 
     setOpen(true); //hien thi success hay error
   };
@@ -177,7 +180,7 @@ function Login({ isLogin, setIsLogin, setCurrentUser }) {
           <ImageCustom
             src={logoImage}
             alt="logo"
-            sx={{ width: "40px", height: "40px", borderRadius: "8px" }}
+            sx={{ width: "80px", height: "40px", borderRadius: "8px" }}
           />
           <Typography
             sx={{
