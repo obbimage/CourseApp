@@ -5,12 +5,14 @@ import { Box, Button, Grid, Icon, Paper, Table, TableBody, TableCell, TableConta
 import { grey } from "@mui/material/colors";
 import { useContext, useEffect, useState } from "react";
 import { CurrentUserContext } from "../../../App";
-import { handleApiResponse } from "../../../api/instance";
+import { handleApiRequest, handleApiResponse } from "../../../api/instance";
 import { getOrderDetailByUserId } from "../../../api/orderDetail";
 import { formatDateFromArray } from "../../../util/date";
 import AvatarCustom from "../../layouts/AvatarCustom";
 import LayoutAdmin, { LayoutContentAdmin } from "../admin/layout/LayoutAdmin";
 import PointOfSaleIcon from '@mui/icons-material/PointOfSale';
+import { getWallet } from "../../../api/auth";
+import { getCourseByUserId } from "../../../api/course";
 const colorGrey = grey[200];
 
 function TableCellInfo({ value }) {
@@ -61,7 +63,6 @@ function Row({ value }) {
     useEffect(() => {
         setOrderDetail(value);
         setOrder(orderDetail.order);
-        console.log(orderDetail.order.orderDate)
         setUserByCourse(orderDetail.order.user);
     }, [value]);
 
@@ -142,6 +143,8 @@ function CardButton({ content, icon }) {
 export default function CharEducator() {
     const theme = useTheme();
     const [orderDetails, setOrderDetails] = useState([]);
+    const [courses, setCourses] = useState([]);
+    const [wallet,setWallet] = useState(0);
 
     const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
 
@@ -153,12 +156,31 @@ export default function CharEducator() {
                 handleApiResponse(response,
                     //success
                     (orderDetailResponse) => {
-                        console.log(orderDetailResponse);
                         setOrderDetails(orderDetailResponse);
 
                     }
                 )
             })
+
+        getWallet()
+        .then(response=>{
+            handleApiResponse(response,
+                //sucess
+                (walletResponse)=>{
+                    setWallet(walletResponse);
+                }
+            )
+        });
+
+        getCourseByUserId(userId)
+        .then(response=>{
+            handleApiResponse(response,
+                // success
+                (coursesResponse)=>{
+                    setCourses(coursesResponse);
+                }
+            )
+        })
     }, [currentUser])
 
 
@@ -169,18 +191,18 @@ export default function CharEducator() {
                     <Grid container spacing={3}>
                         <CarInfo
                             title={"Tổng tiền"}
-                            title1={`+ ${0} VND`}
-                            title2={`+ ${0} VND tháng này`}
+                            title1={`+ ${wallet} VND`}
+                            title2={`+ ${wallet} VND tháng này`}
                             icon={<Button color="success"><LocalAtmIcon /></Button>} />
                         <CarInfo
-                            title={"Đã gút"}
-                            title1={`- ${0} VND`}
-                            title2={`- ${0} VND tháng này`}
+                            title={"Khóa học đã tạo"}
+                            title1={` ${courses.length} Khóa học `}
+                            title2={` ${courses.length} khóa học tháng này`}
                             icon={<Button color="error"><CreditScore /></Button>} />
                         <CarInfo
                             title={"Khóa học đã đăng"}
-                            title1={`+ ${0} Khóa`}
-                            title2={`+ ${0} Khóa tháng này`}
+                            title1={`+ ${courses.length} Khóa`}
+                            title2={`+ ${courses.length} Khóa tháng này`}
                             icon={<Button color="warning"><CastForEducationIcon /></Button>} />
                         <CardButton
                             icon={<PointOfSaleIcon />}
