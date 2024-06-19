@@ -13,3 +13,9 @@ export async function getChatsByCourseId(courseId) {
     return await instance.get(`${URL_CHAT}/course/${courseId}`);
   });
 }
+
+export async function updateStatusChatById(id, chat) {
+  return handleApiRequest(async () => {
+    return await instance.put(`${URL_CHAT}/${id}`, chat);
+  });
+}

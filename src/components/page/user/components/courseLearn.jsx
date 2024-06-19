@@ -18,7 +18,7 @@ import { alpha, styled } from "@mui/material/styles";
 import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { CurrentUserContext } from "../../../../App";
-import { getCourseFromBuy } from "../../../../api/course";
+import { getCourseById, getCourseFromBuy } from "../../../../api/course";
 import { handleApiResponse } from "../../../../api/instance";
 import { getRatesByCourseId, insertRate } from "../../../../api/rate";
 import { getUnitsByCourseId } from "../../../../api/unit";
@@ -29,13 +29,12 @@ import courseVip1 from "../assets/images/coursevip1.png";
 import Comment from "./comment";
 import convertStringHtml from "./convertStringToHtml";
 import CourseInfo from "./courseInfo";
-import Chat from "./chat";
 import * as React from "react";
 import Drawer from "@mui/material/Drawer";
 import CssBaseline from "@mui/material/CssBaseline";
 import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
-import { getChatsByCourseId, insertChat } from "../../../../api/chat";
+import QuestionCourse from "./questionCourse";
 
 const drawerWidth = 340;
 
@@ -82,21 +81,13 @@ function CourseLearn() {
   const [isFocused, setIsFocused] = useState(false);
   const [isValue, setIsValue] = useState(false);
   const [searchValue, setSearchValue] = useState("");
-  const [chatValue, setChatValue] = useState("");
 
   const [courseId, setCourseId] = useState(null);
   const [course, setCourse] = useState({});
   const [units, setUnits] = useState([]);
   const [rates, setRate] = useState([]); // danh sach đánh giá
-  const [chats, setChat] = useState([]); //danh sach tro chuyen
-  const [questions, setQuestions] = useState([]); //danh sach cau hoi
 
   const [rateNew, setRateNew] = useState({ rate: 5 });
-  const [chatNew, setChatNew] = useState({
-    time: "1 giay truoc",
-    enjoy: 0,
-    idFeedback: 0,
-  });
 
   const params = useParams();
   const navigate = useNavigate();
@@ -112,6 +103,17 @@ function CourseLearn() {
 
   useEffect(() => {
     if (!isObjEmpty(currentUser)) {
+      getCourseById(courseId).then((response) => {
+        handleApiResponse(
+          response,
+          // success
+          (courseResponse) => {
+            setCourse(courseResponse);
+            console.log("course by id ", courseResponse);
+          }
+        );
+      });
+
       // lấy thông tin khóa học
       getCourseFromBuy(courseId).then((response) => {
         handleApiResponse(
@@ -143,27 +145,6 @@ function CourseLearn() {
           (rateResponse) => {
             setRate(rateResponse);
             console.log("rate response: ", rateResponse);
-          }
-        );
-      });
-
-      const getChatsQuestion = (chatResponse) => {
-        chatResponse.forEach((q) => {
-          if (q.idFeedback === 0) {
-            setQuestions((prevQuestions) => [...prevQuestions, q]);
-          }
-        });
-      };
-
-      // lấy danh sách tro chuyen
-      getChatsByCourseId(courseId).then((response) => {
-        handleApiResponse(
-          response,
-          // success
-          (chatResponse) => {
-            setChat(chatResponse);
-            getChatsQuestion(chatResponse);
-            console.log("chat response: ", chatResponse);
           }
         );
       });
@@ -205,13 +186,6 @@ function CourseLearn() {
     // ])
   };
 
-  const handleQuestion = (e) => {
-    setChatValue(e.target.value);
-    e.target.value ? setIsValue(true) : setIsValue(false);
-    let value1 = e.target.value;
-    setChatNew({ ...chatNew, content: value1 });
-  };
-
   const handleUrlVideo = (url) => {
     console.log(url);
     setUrlVideo(url);
@@ -230,22 +204,6 @@ function CourseLearn() {
         }
       );
     });
-  };
-
-  const handleAddChat = () => {
-    console.log("chat new: ", chatNew);
-
-    insertChat(courseId, chatNew).then((response) => {
-      handleApiResponse(
-        response,
-        // success
-        (responseData) => {
-          console.log("inser chat success:", responseData);
-          setQuestions([responseData, ...questions]);
-        }
-      );
-    });
-    setChatValue("");
   };
 
   return (
@@ -551,84 +509,11 @@ function CourseLearn() {
                 </Box>
               </TabPanel>
               <TabPanel value="4">
-                <Box>
-                  <Box
-                    sx={{
-                      display: "flex",
-                      alignItems: "center",
-                      gap: "12px",
-                      mb: "24px",
-                    }}
-                  >
-                    <Typography
-                      sx={{
-                        color: "#2d2f31",
-                        fontSize: { sm: "24px" },
-                        fontWeight: "700",
-                      }}
-                    >
-                      Trao đổi giữa giảng viên và học viên
-                    </Typography>
-                  </Box>
-                  <Search isFocused={isFocused}>
-                    <StyledInputBase
-                      onFocus={handleFocus}
-                      onBlur={handleBlur}
-                      onChange={handleQuestion}
-                      onKeyPress={handleKeyPress}
-                      value={chatValue}
-                      placeholder="Nhập câu hỏi cần giải đáp..."
-                      inputProps={{ "aria-label": "search" }}
-                    />
-                    {isValue && (
-                      <Button
-                        onClick={handleAddChat}
-                        sx={{
-                          backgroundColor: "#2d2f31",
-                          p: "6px",
-                          width: "80px",
-                          height: "34px",
-                          borderRadius: "20px",
-                          position: "absolute",
-                          top: "2px",
-                          right: "2px",
-                          color: "#fff",
-                          "&:hover": {
-                            backgroundColor: "#2d2f31 !important",
-                            opacity: 0.9,
-                          },
-                        }}
-                      >
-                        <NearMeIcon />
-                      </Button>
-                    )}
-                  </Search>
-
-                  <Box sx={{ mt: "24px" }}>
-                    <Grid container spacing={2}>
-                      {questions.map((c) => {
-                        return (
-                          <Grid item xs={12} sx={{ minWidth: "320px" }}>
-                            <Chat
-                              key={c?.id}
-                              id={c?.id}
-                              img={c?.user?.avatar}
-                              name={
-                                c?.user?.firstName + " " + c?.user?.lastName
-                              }
-                              content={c?.content}
-                              time={c?.time}
-                              enjoy={c?.enjoy}
-                              idFeedback={c?.idFeedback}
-                              courseId={courseId}
-                              chatAll={chats}
-                            />
-                          </Grid>
-                        );
-                      })}
-                    </Grid>
-                  </Box>
-                </Box>
+                <QuestionCourse
+                  courseId={courseId}
+                  currentUser={currentUser}
+                  idActor={course?.user?.id}
+                />
               </TabPanel>
             </TabContext>
           </Box>

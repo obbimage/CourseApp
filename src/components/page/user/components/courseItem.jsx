@@ -48,79 +48,76 @@ function CourseItem() {
     const searchParams = new URLSearchParams(location.search);
     const courseIdParam = searchParams.get("course_id");
 
-    getCourseById(courseIdParam)
-      .then(response => {
-        handleApiResponse(response,
-          // success
-          (courseResponse) => {
-            setCourse(courseResponse);
-          }
-        )
-      });
+    getCourseById(courseIdParam).then((response) => {
+      handleApiResponse(
+        response,
+        // success
+        (courseResponse) => {
+          setCourse(courseResponse);
+          console.log("course by id ", courseResponse);
+        }
+      );
+    });
   }, []);
 
   React.useEffect(() => {
     // kiểm tra đã login hay chưa
-    console.log('currentUser: ', currentUser)
+    console.log("currentUser: ", currentUser);
     if (!isObjEmpty(currentUser) && currentUser) {
       let course_id = course?.id;
       let user_id = currentUser.id;
       // lấy thông tin khóa học
-      isBuyCourse(course_id, user_id)
-        .then(response => {
-          handleApiResponse(response,
-            // success
-            (isResult) => {
-              setIsBuy(isResult);
-            }
-          )
-        });
+      isBuyCourse(course_id, user_id).then((response) => {
+        handleApiResponse(
+          response,
+          // success
+          (isResult) => {
+            setIsBuy(isResult);
+          }
+        );
+      });
       // lấy đánh giá khóa học
-      getRatesByCourseId(course_id)
-        .then(response => {
-          handleApiResponse(response,
-            // sucess
-            (ratesResponse) => {
-              setRate(ratesResponse);
-            }
-          )
-        })
-
+      getRatesByCourseId(course_id).then((response) => {
+        handleApiResponse(
+          response,
+          // sucess
+          (ratesResponse) => {
+            setRate(ratesResponse);
+          }
+        );
+      });
     }
-  }, [course])
+  }, [course]);
 
   React.useEffect(() => {
     let courseId = course.id;
     if (courseId) {
       // get whose course
-      getWhoCourseByCourseId(courseId)
-        .then(response => {
-          handleApiResponse(response,
-            // success
-            (whoCourseResponse) => {
-              setWhoCourses(whoCourseResponse)
-            }
-          )
-        });
+      getWhoCourseByCourseId(courseId).then((response) => {
+        handleApiResponse(
+          response,
+          // success
+          (whoCourseResponse) => {
+            setWhoCourses(whoCourseResponse);
+          }
+        );
+      });
       // get content will learn
-      getStudyWillLearnByCourseId(courseId)
-        .then(response => {
-          handleApiResponse(response,
-            (studentWillLearnResponse) => {
-              setStudentWillLearns(studentWillLearnResponse);
-            }
-          )
-        })
+      getStudyWillLearnByCourseId(courseId).then((response) => {
+        handleApiResponse(response, (studentWillLearnResponse) => {
+          setStudentWillLearns(studentWillLearnResponse);
+        });
+      });
 
-      getUnitsByCourseId(courseId)
-        .then(response => {
-          handleApiResponse(response,
-            //success
-            (unitsResponse) => {
-              setUnit(unitsResponse);
-            }
-          )
-        })
+      getUnitsByCourseId(courseId).then((response) => {
+        handleApiResponse(
+          response,
+          //success
+          (unitsResponse) => {
+            setUnit(unitsResponse);
+          }
+        );
+      });
     }
   }, [course]);
 
@@ -145,7 +142,7 @@ function CourseItem() {
                   Nội dung bài học
                 </Typography>
                 <Grid container spacing={2} sx={{ mt: "2px" }}>
-                  {studentWillLearns.map(willLearn => {
+                  {studentWillLearns.map((willLearn) => {
                     return (
                       <Grid
                         sx={{
@@ -281,9 +278,7 @@ function CourseItem() {
               >
                 Mô tả
               </Typography>
-              <Box>
-                {convertStringHtml(String(course.description))}
-              </Box>
+              <Box>{convertStringHtml(String(course.description))}</Box>
             </Box>
             <Box
               sx={{
@@ -303,9 +298,10 @@ function CourseItem() {
                 Đối tượng của khóa học này:
               </Typography>
               <Box>
-                {whoCourses.map(whoCourse => {
+                {whoCourses.map((whoCourse) => {
                   return (
-                    <Box key={whoCourse.id}
+                    <Box
+                      key={whoCourse.id}
                       sx={{
                         display: "flex",
                         gap: "12px",
@@ -319,7 +315,7 @@ function CourseItem() {
                         {whoCourse?.whoCourse}
                       </Typography>
                     </Box>
-                  )
+                  );
                 })}
               </Box>
             </Box>
@@ -425,14 +421,20 @@ function CourseItem() {
                     fontWeight: "700",
                   }}
                 >
-                  {`${rates.length } xếp hạng`}
+                  {`${rates.length} xếp hạng`}
                 </Typography>
               </Box>
               <Box>
                 <Grid container spacing={2}>
-                  {rates.map(rateItem => {
+                  {rates.map((rateItem) => {
                     return (
-                      <Grid item xs={12} sm={6} lg={3} sx={{ minWidth: "320px" }}>
+                      <Grid
+                        item
+                        xs={12}
+                        sm={6}
+                        lg={3}
+                        sx={{ minWidth: "320px" }}
+                      >
                         <Comment rate={rateItem} ImageUser={ImageUser} />
                       </Grid>
                     );

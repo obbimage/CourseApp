@@ -9,7 +9,11 @@ import {
 import { useContext, useEffect, useState } from "react";
 import { alpha, styled } from "@mui/material/styles";
 import NearMeIcon from "@mui/icons-material/NearMe";
-import { getChatsByCourseId, insertChat } from "../../../../api/chat";
+import {
+  getChatsByCourseId,
+  insertChat,
+  updateStatusChatById,
+} from "../../../../api/chat";
 import { handleApiResponse } from "../../../../api/instance";
 import { isObjEmpty } from "../../../../util/object";
 import { CurrentUserContext } from "../../../../App";
@@ -48,18 +52,25 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 function Chat({
   id,
   name,
+  idUser,
   img,
   content,
   time,
   enjoy,
   idFeedback,
+  statusChat,
   courseId,
-  chatAll,
+  isEducator,
+  idActor,
+  noAnswer,
+  setNoAnswer,
 }) {
   const idCurrentFeed = id;
-
+  const [alert, setAlert] = useState("");
+  const [severity, setSeverity] = useState("success");
   const [isFocused, setIsFocused] = useState(false);
   const [isValue, setIsValue] = useState(false);
+  const [status, setStatus] = useState(statusChat);
   const [toggleFeed, setToogleFeed] = useState(false);
   const [chatValue, setChatValue] = useState("");
   const [feedback, setFeedback] = useState([]);
@@ -67,6 +78,18 @@ function Chat({
     time: "1 giay truoc",
     enjoy: 0,
     idFeedback: id,
+    status: false,
+  });
+
+  const [updateChatState, setUpdateChatState] = useState({
+    id: id,
+    content: content,
+    time: time,
+    courseId: courseId,
+    userId: idUser,
+    enjoy: enjoy,
+    idFeedback: idFeedback,
+    status: true,
   });
 
   const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
@@ -74,16 +97,34 @@ function Chat({
   //dung idfeedback de tim nhung feedback do
 
   const getChatsFeedback = (chatResponse) => {
-    chatResponse?.forEach((f) => {
-      if (f.idFeedback === id) {
-        setFeedback((prevFeedbacks) => [...prevFeedbacks, f]);
-      }
-    });
+    if (isEducator) {
+      chatResponse?.forEach((f) => {
+        if (f.user.id === currentUser.id && f.idFeedback === id) {
+          setFeedback((prevFeedbacks) => [...prevFeedbacks, f]);
+        }
+      });
+    } else {
+      chatResponse?.forEach((f) => {
+        if (f.idFeedback === id) {
+          setFeedback((prevFeedbacks) => [...prevFeedbacks, f]);
+        }
+      });
+    }
   };
   useEffect(() => {
     if (!isObjEmpty(currentUser)) {
-      getChatsFeedback(chatAll);
+      // lấy tat ca danh sách cuoc tro chuyen cua khoa hoc do
+      getChatsByCourseId(courseId).then((response) => {
+        handleApiResponse(
+          response,
+          // success
+          (chatResponse) => {
+            getChatsFeedback(chatResponse);
+          }
+        );
+      });
     }
+    console.log("so lan useffect chay");
   }, [courseId]);
 
   const handleFeedback = () => {
@@ -104,26 +145,85 @@ function Chat({
     }
   };
 
+  const handleUpdateSuccess = () => {
+    setAlert("Cập nhật thành công");
+    setSeverity("success");
+  };
+
+  const handleUpdatFailed = () => {
+    setAlert("Cập nhật thất bại");
+    setSeverity("error");
+  };
+
+  const updateStatus = (idQuestion) => {
+    updateStatusChatById(idQuestion, updateChatState).then((response) => {
+      handleApiResponse(
+        response,
+        // request success
+        (chatResponse) => {
+          console.log("status quetion chat ", chatResponse);
+          handleUpdateSuccess();
+        },
+        // request error
+        (err) => {
+          handleUpdatFailed();
+        }
+      );
+    });
+  };
+
+  let j = 0;
+  const getChatsNoAnswer = (chatResponse) => {
+    chatResponse.forEach((q) => {
+      if (q.idFeedback === 0 && !q.status) {
+        j = j + 1;
+      }
+    });
+    setNoAnswer(j);
+  };
+
+  const getNoAnswer = (courseId) => {
+    getChatsByCourseId(courseId).then((response) => {
+      handleApiResponse(
+        response,
+        // success
+        (chatResponse) => {
+          getChatsNoAnswer(chatResponse);
+        }
+      );
+    });
+  };
+
+  //khi phan hoi
   const handleQuestion = (e) => {
     setChatValue(e.target.value);
     e.target.value ? setIsValue(true) : setIsValue(false);
     let value1 = e.target.value;
-    setChatNew({ ...chatNew, content: value1 });
+    setChatNew({ ...chatNew, content: value1, status: true });
   };
 
   const handleAddChat = () => {
     console.log("chat new: ", chatNew);
-
+    const i = noAnswer - 1;
     insertChat(courseId, chatNew).then((response) => {
       handleApiResponse(
         response,
         // success
         (responseData) => {
-          console.log("inser feedback success:", responseData);
           setFeedback([responseData, ...feedback]);
+          setStatus(true);
+          //giam so cau hoi chua phan hoi 1
+          getNoAnswer(courseId);
         }
       );
     });
+
+    //neu la ong tac gia phan hoi thi cap nhat lai trang thai cho cau hoi
+    if (currentUser.id === idActor) {
+      updateStatus(id);
+    }
+
+    //xet rong cho o input khi nguoi dung da submit
     setChatValue("");
   };
 
@@ -300,6 +400,28 @@ function Chat({
             </Box>
           )}
         </Box>
+        {isEducator &&
+          (status ? (
+            <Box>
+              <Button
+                sx={{ textTransform: "none" }}
+                variant="outlined"
+                color="success"
+              >
+                Đã phản hồi
+              </Button>
+            </Box>
+          ) : (
+            <Box>
+              <Button
+                sx={{ textTransform: "none" }}
+                variant="outlined"
+                color="warning"
+              >
+                Chưa phản hồi
+              </Button>
+            </Box>
+          ))}
       </Box>
     </Box>
   );
