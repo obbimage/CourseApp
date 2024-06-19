@@ -47,6 +47,9 @@ function Info() {
     city: '',
     email: '',
     country: '',
+    educator:{
+      
+    }
   });
 
   const [openAlert, setOpenAlert] = useState(false);
