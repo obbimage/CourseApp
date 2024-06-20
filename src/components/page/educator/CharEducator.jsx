@@ -1,7 +1,7 @@
 import { CreditScore } from "@mui/icons-material";
 import CastForEducationIcon from '@mui/icons-material/CastForEducation';
 import LocalAtmIcon from '@mui/icons-material/LocalAtm';
-import { Box, Button, Grid, Icon, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography, useTheme } from "@mui/material";
+import { Box, Button, Dialog, DialogActions, DialogContent, Grid, Icon, Paper, Slider, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography, useTheme } from "@mui/material";
 import { grey } from "@mui/material/colors";
 import { useContext, useEffect, useState } from "react";
 import { CurrentUserContext } from "../../../App";
@@ -13,6 +13,7 @@ import LayoutAdmin, { LayoutContentAdmin } from "../admin/layout/LayoutAdmin";
 import PointOfSaleIcon from '@mui/icons-material/PointOfSale';
 import { getWallet } from "../../../api/auth";
 import { getCourseByUserId } from "../../../api/course";
+import { insertTakeWallet } from "../../../api/pay/takeWallet";
 const colorGrey = grey[200];
 
 function TableCellInfo({ value }) {
@@ -86,24 +87,8 @@ function Row({ value }) {
                 <TableCell>
                     {formatDateFromArray(orderDetail.order.orderDate)}
                 </TableCell>
-                {/* <TableCell align="left">
-                    <ButtonAction
-                        onClick={handleToggleOpenRow}
-                        color={!open ? 'secondary' : 'error'}>
-                        {open ? <CloseIcon /> : <VisibilityOutlinedIcon />}
-                    </ButtonAction>
-                    <ButtonAction>
-                        <EditIcon />
-                    </ButtonAction>
-                </TableCell> */}
             </TableRow>
-            {/* <TableRow>
-                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={6}>
-                    <RowMoreInfoEducator
-                        open={open}
-                        value={user} />
-                </TableCell>
-            </TableRow> */}
+
         </>
     );
 }
@@ -125,14 +110,22 @@ function CarInfo({ title, title1, title2, icon }) {
     )
 }
 
-function CardButton({ content, icon }) {
+function CardButton({ content, icon, onClick }) {
     const theme = useTheme();
+
+    const handleClick = () => {
+        if (onClick) {
+            onClick();
+        }
+    }
     return (
         <Grid item xs={2}>
-            <Paper sx={{width:'100%'}}>
-                <Button color="success" sx={{width:'100%', marginRight: theme.spacing(1)}}>
+            <Paper sx={{ width: '100%' }}>
+                <Button
+                    onClick={handleClick}
+                    color="success" sx={{ width: '100%', marginRight: theme.spacing(1) }}>
                     {icon}
-                    <Typography sx={{marginLeft: theme.spacing(1)}}>
+                    <Typography sx={{ marginLeft: theme.spacing(1) }}>
                         {content}
                     </Typography>
                 </Button>
@@ -140,11 +133,98 @@ function CardButton({ content, icon }) {
         </Grid>
     )
 }
+
+function TakeWallet({ open, max, onClose, onSuccess }) {
+
+    const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
+
+    const [price, setPrice] = useState(0); // số tiền muốn rút
+    const [numberBank, setNumberBank] = useState("");
+
+    function valuetext(value) {
+        setPrice(value);
+    }
+
+    const handleTake = () => {
+        if (onClose) {
+            onClose();
+        }
+
+        let walletRequest = {
+            price: price,
+            numberBank: numberBank,
+            nameBank: "VNPay"
+        }
+
+
+
+        insertTakeWallet(currentUser.id, walletRequest)
+            .then(response => {
+                handleApiResponse(response,
+                    // success
+                    (data) => {
+                        console.log('get wallet: ', data);
+                        handleSuccess();
+                    }
+                )
+            })
+    }
+
+    const handleSuccess = () => {
+        if (onSuccess)
+            onSuccess(price);
+    }
+
+    const handleChangeNumBerBank = (e) => {
+        let value = e.target.value;
+        setNumberBank(value);
+    }
+
+
+    return (
+        <Dialog open={open} >
+            <DialogContent sx={{ width: '450px' }}>
+                <Box sx={{ width: "100%" }}>
+                    <Typography>Bạn muốn rút bao nhiêu?</Typography>
+                    <Typography fontWeight={"600"}>{price} VND</Typography>
+                    <Slider
+                        sx={{
+                            width: "95%"
+                        }}
+                        aria-label="Temperature"
+                        defaultValue={0}
+                        getAriaValueText={valuetext}
+                        valueLabelDisplay="auto"
+                        shiftStep={30}
+                        step={10000}
+                        marks
+                        min={0}
+                        max={max}
+                    />
+                </Box>
+                <Box>
+                    <Typography>Nhập Số tài khoản VnPay:</Typography>
+                    <Typography variant="body2" >Kiểm tra số tài khoản trước khi yêu cầu</Typography>
+                    <TextField sx={{ width: '100%' }}
+                        onChange={handleChangeNumBerBank}
+                    />
+                </Box>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={handleTake}>
+                    Yêu cầu rút
+                </Button>
+            </DialogActions>
+        </Dialog>
+    );
+}
 export default function CharEducator() {
     const theme = useTheme();
     const [orderDetails, setOrderDetails] = useState([]);
     const [courses, setCourses] = useState([]);
-    const [wallet,setWallet] = useState(0);
+    const [wallet, setWallet] = useState(0);
+
+    const [openTakeWallet, setOpenTakeWallet] = useState(false);
 
     const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
 
@@ -163,29 +243,43 @@ export default function CharEducator() {
             })
 
         getWallet()
-        .then(response=>{
-            handleApiResponse(response,
-                //sucess
-                (walletResponse)=>{
-                    setWallet(walletResponse);
-                }
-            )
-        });
+            .then(response => {
+                handleApiResponse(response,
+                    //sucess
+                    (walletResponse) => {
+                        setWallet(walletResponse);
+                    }
+                )
+            });
 
         getCourseByUserId(userId)
-        .then(response=>{
-            handleApiResponse(response,
-                // success
-                (coursesResponse)=>{
-                    setCourses(coursesResponse);
-                }
-            )
-        })
-    }, [currentUser])
+            .then(response => {
+                handleApiResponse(response,
+                    // success
+                    (coursesResponse) => {
+                        setCourses(coursesResponse);
+                    }
+                )
+            })
+    }, [currentUser]);
 
+    const handleSuccessWallet = (price) => {
+        setWallet(price);
+    }
 
+    const handleColseWallet = () => {
+        setOpenTakeWallet(false);
+    }
+    const handleOpenWallet = () => {
+        setOpenTakeWallet(true);
+    }
     return (
         <LayoutAdmin sx={{ p: theme.spacing(3), width: '100%', backgroundColor: '#ffff' }}>
+            <TakeWallet
+                open={openTakeWallet}
+                onClose={handleColseWallet}
+                onSuccess={handleSuccessWallet}
+                max={wallet} />
             <LayoutContentAdmin sx={{ marginTop: '0', backgroundColor: '#ffff' }}>
                 <Box sx={{ backgroundColor: 'initial', marginBottom: theme.spacing(4) }}>
                     <Grid container spacing={3}>
@@ -205,6 +299,7 @@ export default function CharEducator() {
                             title2={`+ ${courses.length} Khóa tháng này`}
                             icon={<Button color="warning"><CastForEducationIcon /></Button>} />
                         <CardButton
+                            onClick={handleOpenWallet}
                             icon={<PointOfSaleIcon />}
                             content="rút tiền"
                         />

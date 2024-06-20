@@ -9,7 +9,7 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import LogoutIcon from '@mui/icons-material/Logout';
 import StorageIcon from '@mui/icons-material/Storage';
 import FolderIcon from '@mui/icons-material/Folder';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import ContactPhoneOutlinedIcon from '@mui/icons-material/ContactPhoneOutlined';
 import ExpandMoreOutlinedIcon from '@mui/icons-material/ExpandMoreOutlined';
 import SchoolOutlinedIcon from '@mui/icons-material/SchoolOutlined';
@@ -166,10 +166,12 @@ export default function NavigationBarAdmin({ handleToggle, onMouseEnter, onMouse
     const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
     const [openState, setOpenState] = useState(true);
     const theme = useTheme();
+    const navigate = useNavigate();
 
     const handleLogOut = () => {
         setCurrentUser({})
         clearToken();
+        navigate("/login/admin")
     }
     const handleOnMouseEnter = () => {
         if (onMouseEnter) {
