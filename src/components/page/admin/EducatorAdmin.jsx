@@ -394,7 +394,7 @@ function RowMoreInfoEducator({ open, value, editMode, setEditMode }) {
             <Divider />
             <Box sx={{ padding: theme.spacing(1, 1), overflow: "auto" }}>
               <TextField
-                label={educator.description}
+                label=""
                 multiline
                 rows={3}
                 fullWidth
