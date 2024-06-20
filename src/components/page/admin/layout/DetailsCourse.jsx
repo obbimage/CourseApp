@@ -8,7 +8,7 @@ import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import { grey } from "@mui/material/colors";
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import { useParams } from "react-router-dom";
-import { getCourseById } from "../../../../api/course";
+import { getCourseById, setConfirmCourse } from "../../../../api/course";
 import { handleApiResponse } from "../../../../api/instance";
 import convertStringHtml from "../../user/components/convertStringToHtml";
 import { getUnitsByCourseId } from "../../../../api/unit";
@@ -67,13 +67,17 @@ const BlockInfoLeftCourse = ({ children }) => {
     )
 }
 
-const UnitList = ({ value }) => {
+const UnitList = ({ value, onChange }) => {
     const [unit, setUnit] = useState(value);
     const [sections, setSections] = useState([]);
 
+    const handleChange = (value) => {
+        if (onChange)
+            onChange(value);
+    }
+
     useEffect(() => {
         setUnit(value);
-        console.log(unit)
 
         let unitId = value.id
         getSectionByUnitId(unitId)
@@ -110,9 +114,11 @@ const UnitList = ({ value }) => {
                         <SectionList
                             value={{
                                 numberSection: section.numberSection,
-                                name: section.title
+                                name: section.title,
+                                video: section.urlVideo
 
                             }}
+                            onSelect={handleChange}
                         />
                     )
                 })
@@ -120,9 +126,14 @@ const UnitList = ({ value }) => {
         </Accordion>
     )
 };
-const SectionList = ({ value }) => {
+const SectionList = ({ value, onSelect }) => {
     const theme = useTheme();
     const section = value;
+
+    const handleSelect = () => {
+        if (onSelect)
+            onSelect(value);
+    }
     return (
         <>
             <AccordionDetails sx={{
@@ -133,6 +144,7 @@ const SectionList = ({ value }) => {
                     color: 'inherit',
                     textAlign: 'left'
                 }}
+                    onClick={handleSelect}
                     startIcon={<PlayCircleOutlineIcon />}>
                     <Content>{section.numberSection}. {section.name}</Content>
                 </Button>
@@ -146,6 +158,11 @@ export default function DetailsCourse() {
     const [course, setCourse] = useState({});
 
     const [units, setUnits] = useState([]);
+    const [section, setSection] = useState({});
+
+    const [openAlert, setOpenAlert] = useState(false);
+    const [alert,setAlert] = useState("");
+    const [severity,setSeverity] = useState("success");
 
     useEffect(() => {
         let courseId = pargram.courseId;
@@ -168,11 +185,38 @@ export default function DetailsCourse() {
                         (unitsResponse) => {
                             console.log(unitsResponse)
                             setUnits(unitsResponse);
+                            // set alert
+                            setAlert("Xuyết duyệt thành công");
+                            setSeverity("success");
+                        },
+                        // failed
+                        (err)=>{
+                            setAlert("Xét duyệt thất bại");
+                            setSeverity("error");
                         }
                     )
-                })
+                    setOpenAlert(true);
+                });
         }
     }, []);
+
+    const handleChangeSection = (value) => {
+        setSection(value);
+    }
+
+    // xét duyệt khóa học
+    const handleConfirm = () => {
+        setConfirmCourse(course.id,true)
+        .then(response=>{
+            handleApiResponse(response,
+                // success
+                (courseResponse)=>{
+                    setCourse(courseResponse);
+                }
+            )
+        })
+    }
+
     return (
         <LayoutAdmin>
             <LayoutHeaderAdmin>
@@ -186,7 +230,7 @@ export default function DetailsCourse() {
                     <Box sx={{ width: '75%' }}>
                         <Box sx={{ height: '656px', marginBottom: theme.spacing(1) }}>
                             <Video
-                                source={"D:\Users\sinht\Downloads\video.mp4"} />
+                                source={section.video} />
                         </Box>
                         <Box>
                             <Box>
@@ -248,7 +292,8 @@ export default function DetailsCourse() {
                         {units.map(unit => {
                             return (
                                 <UnitList
-                                    value={unit} />
+                                    value={unit}
+                                    onChange={handleChangeSection} />
                             );
                         })}
                     </Box>

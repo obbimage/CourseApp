@@ -1,7 +1,7 @@
 import { Box, Divider, Typography, useTheme, useThemeProps } from "@mui/material";
 import { grey } from "@mui/material/colors";
 
-const backgroundColor = grey[300];
+const backgroundColor = "#ffff";
 
 export default function LayoutAdmin({ sx, children }) {
     const theme = useTheme();

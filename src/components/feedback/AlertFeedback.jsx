@@ -15,7 +15,7 @@ export function AlertFeddback({ open, severity, alert, onClose }) {
     return (
         <Snackbar
             open={openState}
-            autoHideDuration={1000}
+            autoHideDuration={5000}
             // onClose={handleClose}
             sx={{zIndex:1}}
             anchorOrigin={{ vertical: "top", horizontal: "center" }}

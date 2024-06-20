@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardContent, CardMedia, Chip, Collapse, Grid, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography, useTheme } from "@mui/material";
+import { Box, Button, Card, CardContent, CardMedia, Chip, Collapse, Grid, Paper, Tab, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography, useTheme } from "@mui/material";
 import LayoutAdmin, { LayoutContentAdmin, LayoutHeaderAdmin } from "./layout/LayoutAdmin";
 import { useContext, useEffect, useState } from "react";
 import { handleApiResponse } from "../../../api/instance";
@@ -9,10 +9,12 @@ import { CreditScore } from "@mui/icons-material";
 import CastForEducationIcon from '@mui/icons-material/CastForEducation';
 import useCurrentUser from "../../../hook/useCurrentUser";
 import { CurrentUserContext } from "../../../App";
-import { getAllTakeWallet, updateTakeWallet } from "../../../api/pay/takeWallet";
+import { getAllTakeWallet, getTakeWalletByGet, updateTakeWallet } from "../../../api/pay/takeWallet";
 import { grey } from "@mui/material/colors";
 import { formatDateFromArray } from "../../../util/date";
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import { AlertFeddback } from "../../feedback/AlertFeedback";
+import { TabContext, TabList, TabPanel } from "@mui/lab";
 
 function CarInfo({ title, title1, title2, icon }) {
     const theme = useTheme();
@@ -78,7 +80,11 @@ function Row({ value, onSuccess, onFailed }) {
     const [codePay, setCodePay] = useState('');
     const [note, setNote] = useState('Thanh toán qua VNPay');
 
-    const {currentUser,setCurrentUser} = useContext(CurrentUserContext);
+    const [openAlert, setOpenAlert] = useState(false);
+    const [severity, setSeverity] = useState("success");
+    const [alert, setAlert] = useState("");
+
+    const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
 
     useEffect(() => {
         setWallet(value);
@@ -92,27 +98,48 @@ function Row({ value, onSuccess, onFailed }) {
     const handleSentData = () => {
         let walletRequest = {
             ...wallet,
-            note:note,
+            note: note,
             tradingCode: codePay,
 
         }
 
         updateTakeWallet(walletRequest)
-        .then(response=>{
-            handleApiResponse(response,
-                // success
-                (data)=>{
-                    setWallet(data);
-                    setCurrentUser({
-                        ...currentUser,
-                        wallet: currentUser.wallet - data.price
-                    })
-                }
-            )
-        })
-        
+            .then(response => {
+                handleApiResponse(response,
+                    // success
+                    (data) => {
+                        setWallet(data);
+                        setCurrentUser({
+                            ...currentUser,
+                            wallet: currentUser.wallet - data.price
+                        });
+                        handleOnSuccess();
+                    },
+                    // falied
+                    (failed) => {
+                        handleOnFailed();
+                    }
+                );
+                setOpenAlert(true);
+            })
+
     }
 
+    const handleOnSuccess = () => {
+        if (onSuccess)
+            onSuccess();
+        // set alert
+        setAlert("Yêu cầu thành công");
+        setSeverity("success");
+    }
+    const handleOnFailed = () => {
+        if (onFailed)
+            onFailed();
+        //set alert
+        setAlert("Yêu cầu thất bại");
+        setSeverity("error");
+
+    }
     const handleChangeCodePay = (e) => {
         let value = e.target.value;
         setCodePay(value);
@@ -124,6 +151,10 @@ function Row({ value, onSuccess, onFailed }) {
 
     return (
         <>
+            <AlertFeddback
+                open={openAlert}
+                alert={alert}
+                severity={severity} />
             <TableRow
                 sx={{ '& > *': { borderBottom: 'unset' } }}>
                 <TableCell component="th" scope="row">
@@ -153,7 +184,7 @@ function Row({ value, onSuccess, onFailed }) {
                         <Grid container>
                             <Grid item xs={4}>
                                 <TextField label="Mã giao dịch"
-                                defaultValue={wallet.tradingCode}
+                                    defaultValue={wallet.tradingCode}
                                     onChange={handleChangeCodePay} />
                             </Grid>
                             <Grid item xs={4}>
@@ -164,7 +195,7 @@ function Row({ value, onSuccess, onFailed }) {
                                 <Button sx={{
                                     width: '140px'
                                 }}
-                                    disabled= {wallet.get ? true : false}
+                                    disabled={wallet.get ? true : false}
                                     onClick={handleSentData}
                                     variant="contained">Thanh toán hoàn tất</Button>
                             </Grid>
@@ -181,69 +212,129 @@ function Char() {
     const [countEducator, setCountEducator] = useState(0);
     const [walletNotGet, setWalletNotGet] = useState([]);
 
+    const [walletGet, setWallet] = useState([]); // danh sach da thanh toan
+
+    const [currentTab, setCurrentTab] = useState('1');
+
+
     const { currentUser, setCurrentUser } = useContext(CurrentUserContext);
 
     useEffect(() => {
-        getAllTakeWallet()
+        getTakeWalletByGet(false)
             .then(response => {
                 handleApiResponse(response,
                     handleApiResponse(response,
                         // success
                         (WalletResponse) => {
-                            console.log(WalletResponse)
                             setWalletNotGet(WalletResponse);
+                        },
+                        // falied
+                        (err) => {
                         }
                     )
-                )
+                );
+            })
+
+        getTakeWalletByGet(true)
+            .then(response => {
+                handleApiResponse(response,
+                    handleApiResponse(response,
+                        // success
+                        (WalletResponse) => {
+                            setWallet(WalletResponse);
+                        },
+                        // falied
+                        (err) => {
+                        }
+                    )
+                );
             })
     }, []);
 
+    const handleChangeTab = (e, tabClick) => {
+        setCurrentTab(tabClick);
+    }
+
     return (
         <LayoutAdmin sx={{ backgroundColor: "#ffff" }}>
-            <LayoutHeaderAdmin>
-                Tổng quan
-            </LayoutHeaderAdmin>
             <LayoutContentAdmin>
+                <LayoutHeaderAdmin>
+                    Tổng quan
+                </LayoutHeaderAdmin>
                 <Grid container spacing={3}>
                     <CarInfo
                         title={"Tổng tiền"}
                         title1={`+ ${currentUser.wallet} VND`}
                         title2={`+ ${0} VND tháng này`}
                         icon={<Button color="success"><LocalAtmIcon /></Button>} />
-                    <CarInfo
+                    {/* <CarInfo
                         title={"Giang Viên đăng ký"}
                         title1={` ${walletNotGet.length} Giảng viên `}
                         title2={` ${walletNotGet.length} Giảng viên tháng nay`}
-                        icon={<Button color="error"><CreditScore /></Button>} />
+                        icon={<Button color="error"><CreditScore /></Button>} /> */}
                 </Grid>
                 <Paper>
-                    <Typography>Danh Yêu cầu rút tiền</Typography>
+                    <Typography variant="h6">Danh Yêu cầu rút tiền</Typography>
                     <Box>
-                        <TableContainer component={Paper}>
-                            <Table aria-label="collapsible table">
-                                <TableHead>
-                                    <TableRow sx={{ backgroundColor: grey[300] }}>
-                                        <TableCell align='left' sx={{ width: theme.spacing(10) }}>ID</TableCell>
-                                        <TableCell align="left">INFO</TableCell>
-                                        <TableCell align="left">Money</TableCell>
-                                        <TableCell align="left">Status</TableCell>
-                                        <TableCell align="left">Date</TableCell>
-                                        <TableCell align="left">Action</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {
-                                        walletNotGet.map((wallet,index) => {
-                                            return <Row value={wallet} />
-                                        })
-                                    }
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
+                        <TabContext value={currentTab}>
+                            <Box>
+                                <TabList onChange={handleChangeTab}>
+                                    <Tab label="Đã thanh toán" value="1" />
+                                    <Tab label="Chưa thành toán" value="2" />
+
+                                </TabList>
+                            </Box>
+                            <TabPanel value="1">
+                                <TableContainer component={Paper}>
+                                    <Table aria-label="collapsible table">
+                                        <TableHead>
+                                            <TableRow sx={{ backgroundColor: grey[300] }}>
+                                                <TableCell align='left' sx={{ width: theme.spacing(10) }}>ID</TableCell>
+                                                <TableCell align="left">INFO</TableCell>
+                                                <TableCell align="left">Money</TableCell>
+                                                <TableCell align="left">Status</TableCell>
+                                                <TableCell align="left">Date</TableCell>
+                                                <TableCell align="left">Action</TableCell>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            {
+                                                walletNotGet.map((wallet, index) => {
+                                                    return <Row value={wallet} />
+                                                })
+                                            }
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            </TabPanel>
+                            <TabPanel value="2">
+                                <TableContainer component={Paper}>
+                                    <Table aria-label="collapsible table">
+                                        <TableHead>
+                                            <TableRow sx={{ backgroundColor: grey[300] }}>
+                                                <TableCell align='left' sx={{ width: theme.spacing(10) }}>ID</TableCell>
+                                                <TableCell align="left">INFO</TableCell>
+                                                <TableCell align="left">Money</TableCell>
+                                                <TableCell align="left">Status</TableCell>
+                                                <TableCell align="left">Date</TableCell>
+                                                <TableCell align="left">Action</TableCell>
+                                            </TableRow>
+                                        </TableHead>
+                                        <TableBody>
+                                            {
+                                                walletGet.map((wallet, index) => {
+                                                    return <Row value={wallet} />
+                                                })
+                                            }
+                                        </TableBody>
+                                    </Table>
+                                </TableContainer>
+                            </TabPanel>
+                        </TabContext>
                     </Box>
                 </Paper>
             </LayoutContentAdmin>
-        </LayoutAdmin>
+        </LayoutAdmin >
     );
 }
 

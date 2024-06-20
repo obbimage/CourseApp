@@ -10,7 +10,7 @@ export default function CardCourse({ course }) {
     }, [course])
     return (
         <>
-            <Card sx={{ width: '100%', padding: theme.spacing(1) }} >
+            <Card sx={{ width: '100%',height:'300px', padding: theme.spacing(1) }} >
                 <Box sx={{ display: 'flex' }}
                     component={Link}
                     href={`course/${courseState.id}/review`}

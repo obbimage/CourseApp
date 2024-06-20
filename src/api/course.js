@@ -85,13 +85,19 @@ export async function getCourseFromBuy(courseId) {
     })
 }
 
-export async function setCompleteCourse(courseId, complete){
-    return handleApiRequest(async ()=>{
+export async function setCompleteCourse(courseId, complete) {
+    return handleApiRequest(async () => {
         return await instance.post(`${URL_COURSE}/${courseId}/${complete}`);
     })
 }
-export async function getCoursesByComplete(complete){
-    return handleApiRequest(async ()=>{
+
+export async function setConfirmCourse(courseId, confirm) {
+    return handleApiRequest(async () => {
+        return await instance.put(`${URL_COURSE}/confirm?course_id=${courseId}&confirm=${confirm}`)
+    })
+}
+export async function getCoursesByComplete(complete) {
+    return handleApiRequest(async () => {
         return await instance.post(`${URL_COURSE}/complete/${complete}`);
     })
 }

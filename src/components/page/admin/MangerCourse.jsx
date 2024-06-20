@@ -21,19 +21,19 @@ export default function MangerCourse() {
                     }
                 )
             })
-        getAllCourseNew(0, 5)
-            .then(response => {
-                handleApiResponse(response,
-                    // success
-                    (responseCourse) => {
-                        setCourses([
-                            ...courses,
-                            ...responseCourse.content,
-                        ]);
+        // getAllCourseNew(0, 5)
+        //     .then(response => {
+        //         handleApiResponse(response,
+        //             // success
+        //             (responseCourse) => {
+        //                 setCourses([
+        //                     ...courses,
+        //                     ...responseCourse.content,
+        //                 ]);
 
-                    }
-                )
-            });
+        //             }
+        //         )
+        //     });
     }, [])
 
     return (
@@ -57,15 +57,15 @@ export default function MangerCourse() {
                             );
                         })
                     }
-                    {
+                    {/* {
                         courses.map((course) => {
                             return (
-                                <Grid key={course.id} item xs={4} sm={6} lg={3} sx={{ minWidth: "320px" }}>
+                                <Grid key={course.id} item xs={3} sm={6} lg={3} sx={{ minWidth: "320px" }}>
                                     <CardCourse course={course} />
                                 </Grid>
                             );
                         })
-                    }
+                    } */}
 
                 </Grid>
             </LayoutContentAdmin>
