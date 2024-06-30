@@ -103,6 +103,7 @@ export default function HeaderLaptop({
   const handleClickSearch = () => {
     console.log("click");
   };
+  
   return (
     <Box
       sx={{

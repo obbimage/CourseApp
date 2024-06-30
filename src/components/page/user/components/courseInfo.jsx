@@ -49,11 +49,14 @@ const AccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
 
 function Section({
   unitId,
+  unitName,
   videoActive,
   setVideoActive,
   setUrlVideo,
   setImageVideo,
   isBuy = false,
+  setUnit,
+  setSystemName,
 }) {
   const [unitIdState, setUnitIdState] = React.useState(unitId);
   const [sections, setSections] = React.useState([]);
@@ -71,7 +74,7 @@ function Section({
     });
   }, [unitIdState]);
 
-  const handleWatchVideo = (id, urlVideo, courseVip) => {
+  const handleWatchVideo = (id, urlVideo, courseVip, unit, sectionTitle) => {
     if (!isBuy) return;
     // if (setUrlVideo) {
     setUrlVideo(urlVideo);
@@ -81,6 +84,9 @@ function Section({
     // }
     // if (setImageVideo) {
     setImageVideo(courseVip);
+    setUnit(unitName);
+    setSystemName(sectionTitle);
+
     // }
   };
 
@@ -101,7 +107,8 @@ function Section({
                 section.numberSection,
                 section.urlVideo,
                 courseVip1,
-                unitId
+                unitId,
+                section.title
               );
             }}
             sx={{
@@ -137,6 +144,8 @@ function CourseInfo({
   setUrlVideo,
   setImageVideo,
   isBuy = false,
+  setUnit,
+  setSystemName,
 }) {
   const [expanded, setExpanded] = React.useState(["panel1"]);
 
@@ -180,11 +189,14 @@ function CourseInfo({
             </AccordionSummary>
             <Section
               unitId={unit.id}
+              unitName={unit.title}
               videoActive={videoActive}
               setVideoActive={setVideoActive}
               setUrlVideo={handleUrlVideo}
               setImageVideo={setImageVideo}
               isBuy={isBuy}
+              setUnit={setUnit}
+              setSystemName={setSystemName}
             />
           </Accordion>
         );

@@ -313,7 +313,9 @@ function Char() {
                         icon={<Button color="error"><CreditScore /></Button>} /> */}
         </Grid>
         <Paper>
-          <Typography variant="h6">Danh Yêu cầu rút tiền</Typography>
+          <Typography variant="h4" sx={{ p: "16px" }}>
+            Danh sách yêu cầu rút tiền
+          </Typography>
           <Box>
             <TabContext value={currentTab}>
               <Box>

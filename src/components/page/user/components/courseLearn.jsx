@@ -86,6 +86,8 @@ function CourseLearn() {
   const [course, setCourse] = useState({});
   const [units, setUnits] = useState([]);
   const [rates, setRate] = useState([]); // danh sach đánh giá
+  const [unit, setUnit] = useState("");
+  const [systemName, setSystemName] = useState("");
 
   const [rateNew, setRateNew] = useState({ rate: 5 });
 
@@ -133,6 +135,7 @@ function CourseLearn() {
           // success
           (unitsResponse) => {
             setUnits(unitsResponse);
+            console.log("lay noi dung koa hoc", unitsResponse);
           }
         );
       });
@@ -296,6 +299,8 @@ function CourseLearn() {
                   setUrlVideo={handleUrlVideo}
                   setImageVideo={setImageVideo}
                   isBuy={true}
+                  setUnit={setUnit}
+                  setSystemName={setSystemName}
                 />
               </TabPanel>
               <TabPanel
@@ -513,6 +518,8 @@ function CourseLearn() {
                   courseId={courseId}
                   currentUser={currentUser}
                   idActor={course?.user?.id}
+                  unit={unit}
+                  systemName={systemName}
                 />
               </TabPanel>
             </TabContext>
@@ -557,6 +564,8 @@ function CourseLearn() {
               setUrlVideo={handleUrlVideo}
               setImageVideo={setImageVideo}
               isBuy={true}
+              setUnit={setUnit}
+              setSystemName={setSystemName}
             />
           </Box>
         </Drawer>

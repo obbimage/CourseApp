@@ -32,7 +32,7 @@ import theme from "../../../theme";
 import React, { useContext, useEffect, useState } from "react";
 import { findeEducators, getAllEducator } from "../../../api/auth";
 import LayoutAdmin, { LayoutContentAdmin } from "../admin/layout/LayoutAdmin";
-import { getCourseByUserId } from "../../../api/course";
+import { findAllCourseByName, getCourseByUserId } from "../../../api/course";
 import { CurrentUserContext } from "../../../App";
 import QuestionItem from "./QuestionItem";
 import { handleApiResponse } from "../../../api/instance";
@@ -113,7 +113,6 @@ function Row({ value }) {
         // success
         (chatResponse) => {
           getChatsQuestion(chatResponse);
-          
         }
       );
     });
@@ -148,9 +147,6 @@ function Row({ value }) {
             color={!open ? "secondary" : "error"}
           >
             {open ? <CloseIcon /> : <VisibilityOutlinedIcon />}
-          </ButtonAction>
-          <ButtonAction>
-            <EditIcon />
           </ButtonAction>
         </TableCell>
       </TableRow>
@@ -256,8 +252,9 @@ export default function QuestionEducator() {
   const [coursesOrgin, setcoursesOrigin] = useState([]);
   const [sortBy, setSortBy] = useState("");
   const [pageTotal, setPageTotal] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
+  const [pageSize, setPageSize] = useState(100);
   const [pageNumber, setPageNumber] = useState(0);
+  const [courseName, setCourseName] = useState("");
 
   const [search, setSearch] = useState("");
 
@@ -305,16 +302,21 @@ export default function QuestionEducator() {
     setSearch(value);
   };
   const handleClickButtonSearch = () => {
-    findeEducators(search, pageNumber, pageSize).then((response) => {
-      handleApiResponse(
-        response,
-        // success
-        (response) => {
-          console.log(response);
-        }
-      );
-    });
+    setCourseName(search);
   };
+
+  useEffect(() => {
+    if (courseName) {
+      findAllCourseByName(courseName, pageNumber, pageSize).then((response) => {
+        handleApiResponse(response, (dataResponse) => {
+          let coursesResponse = dataResponse.content;
+          console.log(coursesResponse);
+          setCourses(coursesResponse);
+        });
+      });
+    }
+  }, [courseName]);
+
   return (
     <LayoutAdmin>
       <LayoutContentAdmin
@@ -332,11 +334,10 @@ export default function QuestionEducator() {
         <Box sx={{ padding: theme.spacing(2), display: "flex" }}>
           <InputSearch
             sx={{ marginRight: theme.spacing(2) }}
-            placeholder={"Id, Name, Phone"}
+            placeholder={"Name course..."}
             onClickSearch={handleClickButtonSearch}
             onChange={handleChangeSearch}
           />
-          <SortBySelect onChange={handleSortByKey} />
         </Box>
         <TableContainer component={Paper}>
           <Table aria-label="collapsible table">

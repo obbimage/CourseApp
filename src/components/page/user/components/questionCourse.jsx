@@ -56,7 +56,8 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
   width: "90%",
 }));
 
-function QuestionCourse({ courseId, currentUser, idActor }) {
+function QuestionCourse({ courseId, currentUser, idActor, unit, systemName }) {
+  console.log("dang o phan", unit, systemName);
   const [isFocused, setIsFocused] = useState(false);
   const [isValue, setIsValue] = useState(false);
   const [chatValue, setChatValue] = useState("");
@@ -69,6 +70,8 @@ function QuestionCourse({ courseId, currentUser, idActor }) {
     enjoy: 0,
     idFeedback: 0,
     status: false,
+    unit: "Giới thiệu về giảng viên & khoá học",
+    systemName: "About me",
   });
 
   useEffect(() => {
@@ -115,12 +118,15 @@ function QuestionCourse({ courseId, currentUser, idActor }) {
     setChatValue(e.target.value);
     e.target.value ? setIsValue(true) : setIsValue(false);
     let value1 = e.target.value;
-    setChatNew({ ...chatNew, content: value1 });
+    setChatNew({
+      ...chatNew,
+      content: value1,
+      unit: unit,
+      systemName: systemName,
+    });
   };
 
   const handleAddChat = () => {
-    console.log("chat new: ", chatNew);
-
     insertChat(courseId, chatNew).then((response) => {
       handleApiResponse(
         response,
@@ -205,6 +211,8 @@ function QuestionCourse({ courseId, currentUser, idActor }) {
                   idFeedback={c?.idFeedback}
                   courseId={courseId}
                   idActor={idActor}
+                  unit={c.unit}
+                  systemName={c.systemName}
                 />
               </Grid>
             );

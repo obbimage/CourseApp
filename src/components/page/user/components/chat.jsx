@@ -64,6 +64,8 @@ function Chat({
   idActor,
   noAnswer,
   setNoAnswer,
+  unit,
+  systemName,
 }) {
   const idCurrentFeed = id;
   const [alert, setAlert] = useState("");
@@ -79,6 +81,8 @@ function Chat({
     enjoy: 0,
     idFeedback: id,
     status: false,
+    unit: unit,
+    systemName: systemName,
   });
 
   const [updateChatState, setUpdateChatState] = useState({
@@ -124,7 +128,6 @@ function Chat({
         );
       });
     }
-    console.log("so lan useffect chay");
   }, [courseId]);
 
   const handleFeedback = () => {
@@ -226,6 +229,7 @@ function Chat({
     //xet rong cho o input khi nguoi dung da submit
     setChatValue("");
   };
+  console.log(unit, systemName);
 
   return (
     <Box sx={{ p: "0" }}>
@@ -260,16 +264,34 @@ function Chat({
                 borderRadius: "8px",
               }}
             >
-              <Typography
+              <Box
                 sx={{
-                  color: "#2d2f31",
-                  textDecoration: "none",
-                  fontWeight: "600",
-                  fontSize: "16px",
+                  display: "flex",
+                  justifyContent: "space-between",
+                  width: "100%",
                 }}
               >
-                {name ? name : "anonymous user"}
-              </Typography>
+                <Typography
+                  sx={{
+                    color: "#2d2f31",
+                    textDecoration: "none",
+                    fontWeight: "600",
+                    fontSize: "16px",
+                  }}
+                >
+                  {name ? name : "anonymous user"}
+                </Typography>
+                <Typography
+                  sx={{
+                    color: "#2d2f31",
+                    textDecoration: "none",
+                    fontSize: "14px",
+                  }}
+                >
+                  {unit + " - " + systemName}
+                </Typography>
+              </Box>
+
               <Typography
                 sx={{
                   color: "#2d2f31",

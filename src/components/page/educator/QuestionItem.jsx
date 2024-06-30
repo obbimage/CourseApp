@@ -210,6 +210,8 @@ function QuestionItem({
                   idActor={idActor}
                   noAnswer={noAnswer}
                   setNoAnswer={setNoAnswer}
+                  unit={c.unit}
+                  systemName={c.systemName}
                 />
               </Grid>
             );
